@@ -30,7 +30,7 @@ const Lessons = (() => {
       why: "Play first, so you know what you're about to change.",
       steps: [
         "Pick a move under the arena. Watch what it does.",
-        "Try <b>Kindle</b>, then a hit. Kindle doubles your next hit.",
+        "Try <b>Kindle</b>, then a hit. Kindle doubles your next hit that lands, unless Dewsnoot's dew puts it out first.",
         "Keep going until Dewsnoot sits down, out of puff.",
       ],
       check: () => progress.wins >= 1,
@@ -116,7 +116,7 @@ const Lessons = (() => {
       id: "changes", tier: 2, title: "Read the changes", manual: true,
       why: "A <b>diff</b> shows exactly what changed: red lines removed, green lines added. Reading diffs is how you check what Claude, or anyone, really did.",
       steps: [
-        'Open your save points on GitHub: <a href="https://github.com/robhessdev/snoot-pets/commits/main" target="_blank" rel="noopener">github.com/robhessdev/snoot-pets/commits/main</a>. Click the top one. Red lines were removed, green lines were added.',
+        'Open your project on GitHub and click <b>Commits</b> to see your save points (for this project: <a href="https://github.com/robhessdev/snoot-pets/commits/main" target="_blank" rel="noopener">github.com/robhessdev/snoot-pets/commits/main</a>). Click the top one. Red lines were removed, green lines were added.',
         "In VS Code, change one small thing in <b>my-embersnoot.js</b> (your victoryLine, say) and save.",
         "Click the <b>Source Control</b> icon on VS Code's left edge (three dots joined by lines). Click <b>my-embersnoot.js</b> under Changes: there's your change in red and green, before you've even made a save point.",
       ],

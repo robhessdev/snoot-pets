@@ -96,6 +96,7 @@ const Battle = (() => {
     $("rematch").hidden = true;
     $("dew-level").textContent = L === 0 ? "gentle" : L === 8 ? "full strength" : `tougher ×${L}`;
     bars(); setButtons(false); lines = [];
+    Fx.clearBanner();                       // remove last spar's "wins!" banner
     log("Dewsnoot waddles in to guard his garden…");
     const c = Lessons.cheerLine();                           // your cheer, from practice/my-functions.js
     if (c) log(`${S.trainerName || "You"}: “${c}”`);
@@ -201,7 +202,7 @@ const Battle = (() => {
     if (g.dew.puff <= 0) {
       g.over = true; g.dew.puff = 0; bars();
       Dew.play("oops", { hold: true }); Ember.play("win"); Sound.play("win");
-      Fx.banner(`🔥 ${S.name} wins!`, "ember");
+      Fx.banner(`🔥 ${S.name} wins!`, "ember", true);
       log(`Dewsnoot sits down, out of puff. ${S.name}: “${S.victoryLine}”`);
       Lessons.recordWin();
       $("rematch").hidden = false; return true;
@@ -209,7 +210,7 @@ const Battle = (() => {
     if (g.ember.puff <= 0) {
       g.over = true; g.ember.puff = 0; bars();
       Ember.play("lose"); Dew.play("hop"); Sound.play("lose");
-      Fx.banner("🌿 Dewsnoot wins this one", "dew");
+      Fx.banner("🌿 Dewsnoot wins this one", "dew", true);
       log(`${S.name}'s flames burn low. Time for a nap. Dewsnoot looks very pleased with himself.`);
       Lessons.recordLoss();
       $("rematch").hidden = false; return true;
@@ -282,12 +283,15 @@ const Fx = (() => {
   }
 
   // The "Embersnoot uses Spark Flick!" banner across the top of the arena.
+  // stay: true keeps it up (used for the result) until the next spar clears it.
   let bannerTimer;
-  function banner(text, side) {
+  function banner(text, side, stay = false) {
     const b = $("action-banner");
     b.textContent = text; b.className = `action-banner show banner-${side}`;
-    clearTimeout(bannerTimer); bannerTimer = setTimeout(() => b.className = "action-banner", 1300);
+    clearTimeout(bannerTimer);
+    if (!stay) bannerTimer = setTimeout(clearBanner, 1300);
   }
+  function clearBanner() { clearTimeout(bannerTimer); $("action-banner").className = "action-banner"; }
 
-  return { shoot, pop, sparkle, banner };
+  return { shoot, pop, sparkle, banner, clearBanner };
 })();
