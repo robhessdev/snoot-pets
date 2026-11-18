@@ -1,0 +1,3 @@
+# Files Git should ignore (Mac system clutter)
+.DS_Store
+._*

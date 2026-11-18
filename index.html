@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Snoot Pets</title>
+  <link rel="stylesheet" href="game-parts/styles.css">
+  <!-- This tiny script listens for typos in my-embersnoot.js,
+       so the red bar can say which line has the problem. -->
+  <script>
+    window.SNOOT_ERRORS = [];
+    window.addEventListener("error", function (e) {
+      if (String(e.filename || "").indexOf("my-embersnoot.js") !== -1)
+        window.SNOOT_ERRORS.push({ line: e.lineno, message: e.message });
+    });
+  </script>
+</head>
+<body>
+  <main class="shell">
+    <header class="top">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">🔥</span> SNOOT PETS</div>
+      <nav class="top-links">
+        <span class="level" id="level">Level 0</span>
+        <button type="button" class="notebook-btn" id="notebook-open">📓 Notebook <span class="nb-count" id="nb-count"></span></button>
+        <a href="guide.html">Guide</a>
+      </nav>
+    </header>
+
+    <p class="preview-banner" id="preview-banner" hidden>You're viewing the online preview. Your own copy, the one you can change, is in <b>Documents → Snoot-Pets</b> on your Mac.</p>
+
+    <div id="checker" class="checker" role="status" aria-live="polite"></div>
+
+    <section class="hero">
+      <h1><span class="pet-name">Embersnoot</span> <span class="vs">vs</span> Dewsnoot</h1>
+      <p class="yours">🔥 <b><span class="pet-name">Embersnoot</span> is yours.</b> Change it in <code>my-embersnoot.js</code>, save (⌘S), then reload this page (⌘R).</p>
+    </section>
+
+    <section class="arena-card" aria-label="Battle arena">
+      <div class="arena" id="arena">
+        <!-- LEFT: the opponent -->
+        <div class="side side-dew">
+          <span class="team-badge badge-them">OPPONENT · TEAM GARDEN 🌿</span>
+          <div class="nameplate">
+            <span>Dewsnoot <small id="dew-level">gentle</small></span>
+            <span class="tag" id="dew-shield" hidden>fern shield</span>
+          </div>
+          <div class="bar"><div class="fill fill-dew" id="dew-bar"></div></div>
+          <span class="puff" id="dew-puff">30 / 30</span>
+          <div class="dew-stage">
+            <div class="dew-mover" id="dew-mover">
+              <div class="shield-bubble" id="shield-bubble" hidden></div>
+              <div class="dew-scale"><div class="dew-sprite" id="dew-sprite" role="img" aria-label="Dewsnoot, the opponent: a slate-blue garden creature with a fern fan"></div></div>
+            </div>
+          </div>
+        </div>
+        <!-- RIGHT: your pet -->
+        <div class="side side-ember">
+          <span class="team-badge badge-you" id="badge-you">YOU · TEAM FLAME 🔥</span>
+          <div class="nameplate">
+            <span class="pet-name">Embersnoot</span>
+            <span class="tag" id="ember-charged" hidden>kindled ×2</span>
+          </div>
+          <div class="bar"><div class="fill fill-ember" id="ember-bar"></div></div>
+          <span class="puff" id="ember-puff">40 / 40</span>
+          <canvas id="ember-canvas" class="ember-canvas" role="img" aria-label="Your pet: a small fire creature with flames on its head and a flame-tipped tail"></canvas>
+        </div>
+        <div class="action-banner" id="action-banner" aria-hidden="true"></div>
+        <div class="fx" id="fx" aria-hidden="true"></div>
+      </div>
+
+      <p class="battle-log" id="battle-log" role="status" aria-live="polite">Getting ready…</p>
+      <div class="moves" id="moves"></div>
+      <div class="save-reminder" id="save-reminder" role="status" hidden></div>
+      <div class="arena-foot">
+        <button type="button" class="primary" id="rematch" hidden>Spar again</button>
+        <button type="button" class="chip" id="sound-toggle" aria-pressed="true">🔊 Sound on</button>
+        <span class="peeks">Show me the code:
+          <button type="button" class="chip" data-peek="bar">puff bar</button>
+          <button type="button" class="chip" data-peek="dew">Dewsnoot's moves</button>
+          <button type="button" class="chip" data-peek="checker">green/red bar</button>
+        </span>
+      </div>
+    </section>
+
+    <section class="peek" id="peek" hidden aria-labelledby="peek-title">
+      <div class="peek-head"><h2 id="peek-title">Code</h2><button type="button" class="chip" id="peek-close">Close</button></div>
+      <pre class="peek-code"><code id="peek-code"></code></pre>
+      <p class="eyebrow">WHAT EACH PIECE MEANS</p>
+      <ul class="peek-notes" id="peek-notes"></ul>
+      <p class="peek-try" id="peek-try"></p>
+    </section>
+
+    <section class="quests" aria-labelledby="quests-title">
+      <div class="quests-side">
+        <p class="eyebrow">LEARN BY DOING</p>
+        <h2 id="quests-title">Quests</h2>
+        <ol class="quest-list" id="quest-list"></ol>
+        <p class="small">Each quest you finish levels up <span class="pet-name">Embersnoot</span>, makes Dewsnoot a little tougher, and unlocks a page in your 📓 Notebook.</p>
+      </div>
+      <div class="quest-card" id="quest-card"></div>
+    </section>
+
+    <footer class="foot">
+      <p>🔥 Your pet lives in <code>my-embersnoot.js</code>. Change it any time.</p>
+      <button type="button" class="chip" id="start-over">Start over</button>
+    </footer>
+  </main>
+
+  <!-- The Notebook: slides in from the right -->
+  <aside class="notebook" id="notebook" hidden aria-labelledby="nb-title">
+    <div class="nb-head">
+      <div><p class="eyebrow">WHAT I'VE LEARNED</p><h2 id="nb-title">📓 Notebook</h2></div>
+      <button type="button" class="chip" id="notebook-close">Close</button>
+    </div>
+    <p class="small">One idea per card. Use Next and Back, or the ← → keys. Quests unlock new cards, and each chapter ends with one quick question.</p>
+    <div class="nb-tabs" id="nb-tabs"></div>
+    <article class="nb-card" id="nb-card"></article>
+    <div class="nb-nav">
+      <button type="button" class="chip" id="nb-back">← Back</button>
+      <div class="nb-dots" id="nb-dots" aria-hidden="true"></div>
+      <button type="button" class="primary" id="nb-next">Next →</button>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <!-- The order matters: your pet's settings load first, then the game parts that use them. -->
+  <script src="my-embersnoot.js"></script>
+  <script src="game-parts/checker.js"></script>
+  <script src="game-parts/sounds.js"></script>
+  <script src="game-parts/notebook.js"></script>
+  <script src="game-parts/embersnoot.js"></script>
+  <script src="game-parts/dewsnoot.js"></script>
+  <script src="game-parts/battle.js"></script>
+  <script src="game-parts/lessons.js"></script>
+</body>
+</html>

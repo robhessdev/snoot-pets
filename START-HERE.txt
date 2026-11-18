@@ -1,0 +1,23 @@
+SNOOT PETS — START HERE
+=======================
+
+1. PLAY
+   Double-click  index.html  to open the game in your browser.
+
+2. YOUR PET IS YOURS TO CHANGE
+   Your fire pet lives in one file:  my-embersnoot.js
+   Its name, colours, shape and moves are all in there.
+
+   The loop you'll use every time:
+     change it  ->  save (Cmd+S)  ->  reload the game (Cmd+R)  ->  read the bar at the top
+     GREEN = it worked.  RED = it tells you what to fix.
+
+3. FOLLOW THE QUESTS
+   They're under the arena in the game. Quest 2 helps you install VS Code,
+   the editor you'll use to change your pet.
+
+4. NEED HELP?
+   Open guide.html, or ask Claude in the Code tab:
+   "Fix my-embersnoot.js and explain what was wrong."
+
+Dewsnoot's artwork was made in Codex/ChatGPT. The original package is in Documents/Codex.

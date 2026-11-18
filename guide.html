@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Snoot Pets — the guide</title>
+  <link rel="stylesheet" href="game-parts/styles.css">
+</head>
+<body>
+  <main class="shell guide">
+    <header class="top">
+      <div class="brand"><span aria-hidden="true">🔥</span> SNOOT PETS · GUIDE</div>
+      <nav class="top-links"><a href="index.html">Back to the game</a></nav>
+    </header>
+
+    <section class="big">
+      <p class="eyebrow">THE MOST IMPORTANT THING</p>
+      <h2>Embersnoot is yours. Change it.</h2>
+      <p>Your pet lives in one file: <code>my-embersnoot.js</code>. Its name, colours, shape and battle moves are all in there, written in plain words with notes beside each one.</p>
+      <p><b>The loop you'll use every time:</b></p>
+      <ol>
+        <li>Change something in <code>my-embersnoot.js</code> in VS Code.</li>
+        <li>Save: <b>⌘S</b></li>
+        <li>Reload the game in your browser: <b>⌘R</b></li>
+        <li>Read the bar at the top. <b style="color:var(--good)">Green</b> means it worked. <b style="color:var(--bad)">Red</b> says what's wrong and how to fix it.</li>
+      </ol>
+      <p>Dewsnoot stays the same. He's the opponent, and he gets a little tougher each time you level up.</p>
+      <p>Everything you learn along the way collects in the <b>📓 Notebook</b> button at the top of the game.</p>
+    </section>
+
+    <section>
+      <p class="eyebrow">GETTING STARTED</p>
+      <h2>How to open the game</h2>
+      <ol>
+        <li>Open <b>Finder</b>, go to <b>Documents</b>, then <b>Snoot-Pets</b>.</li>
+        <li>Double-click <b>index.html</b>. It opens in your web browser.</li>
+        <li>Follow the quests under the arena. The first one is just playing.</li>
+      </ol>
+      <p>Nothing needs installing to play. The second quest sets up VS Code, which you'll use to change your pet.</p>
+    </section>
+
+    <section>
+      <p class="eyebrow">THE FOLDER</p>
+      <h2>What each file is for</h2>
+<pre class="tree">Snoot-Pets/
+├── START-HERE.txt      a short note on what to do first
+├── index.html          the game. Double-click to play.
+├── guide.html          this guide
+├── my-embersnoot.js    🔥 YOUR PET. Change this one.
+├── for-codex/          the brief for Codex's painted Embersnoot
+└── game-parts/         the machinery. Look inside any time,
+    ├── styles.css        but you don't need to change it yet.
+    ├── checker.js        reads your file and spots mistakes
+    ├── embersnoot.js     draws your pet with code
+    ├── dewsnoot.js       plays Dewsnoot's painted frames
+    ├── battle.js         the battle rules
+    ├── sounds.js         sound effects, made with code
+    ├── notebook.js       the pages in your 📓 Notebook
+    ├── lessons.js        quests and "show me the code"
+    └── art/dewsnoot.png  Dewsnoot's artwork</pre>
+      <dl>
+        <dt>.html (HTML): the structure</dt><dd>What's on the page: headings, buttons, the arena.</dd>
+        <dt>.css (CSS): the look</dt><dd>Colours, spacing and layout.</dd>
+        <dt>.js (JavaScript): the behaviour</dt><dd>What happens when you click, how the battle works, and your pet's settings.</dd>
+        <dt>.png: a picture</dt><dd>Dewsnoot's painted animation frames, all in one image.</dd>
+      </dl>
+      <p>Your pet and Dewsnoot are animated two different ways. <b>Embersnoot is drawn by code</b>, so changing a number changes its shape. <b>Dewsnoot is a painted picture</b>, so changing him means making new art. That's why Embersnoot is the one you can shape.</p>
+    </section>
+
+    <section>
+      <p class="eyebrow">SAVING</p>
+      <h2>What gets saved, and where</h2>
+      <dl>
+        <dt>Your changes to Embersnoot</dt><dd>Saved in <code>my-embersnoot.js</code> when you press ⌘S. They're kept for good, like any document.</dd>
+        <dt>Your quests, level and wins</dt><dd>Saved automatically in this browser on this computer. Another browser or device starts fresh. <b>Start over</b> at the bottom of the game wipes them.</dd>
+        <dt>Save points (backups)</dt><dd>When your pet has changed, the game reminds you after a spar or a quest to make a save point. Quest 8 sets up <b>Git</b>, which takes snapshots of the whole folder so you can always go back.</dd>
+        <dt>If you share the game</dt><dd>Everyone who opens a shared copy starts from the beginning with the original Embersnoot. Nothing they do changes yours. Your changes only appear in the shared copy if you ask Claude to update it.</dd>
+      </dl>
+    </section>
+
+    <section>
+      <p class="eyebrow">WHEN THE BAR GOES RED</p>
+      <h2>Mistakes are normal, and fixable</h2>
+      <p>The game still runs: it uses a safe value for whatever's broken, and the red bar says where to look. The three usual causes:</p>
+      <ul>
+        <li><b>Curly quotes</b> “like this” instead of straight ones "like this". Retype the quote in VS Code.</li>
+        <li><b>A missing comma</b> at the end of a line. Every item ends with <code>,</code></li>
+        <li><b>A deleted bracket</b> <code>}</code> or <code>]</code>. Press ⌘Z in VS Code to undo.</li>
+      </ul>
+      <p>VS Code also draws a red squiggly line under the exact spot. Still stuck? Ask Claude: <i>“Fix my-embersnoot.js and explain what was wrong.”</i></p>
+    </section>
+
+    <section>
+      <p class="eyebrow">WORKING WITH CLAUDE</p>
+      <h2>Asking for a change</h2>
+      <ol>
+        <li>Open the Claude app and switch to the <b>Code</b> tab.</li>
+        <li>Choose <b>Documents → Snoot-Pets</b> as the folder to work in.</li>
+        <li>Say what you want in plain words.</li>
+      </ol>
+      <p>A good request covers three things: <b>what to change</b>, <b>what to leave alone</b>, and <b>how to explain it</b>. For example:</p>
+      <p class="why">“Give Embersnoot a new move called Ember Rain that hits for 11 with a 75 chance. Only change my-embersnoot.js. Then explain what you added, line by line, in plain words.”</p>
+      <p>Afterwards, open the file in VS Code and look at what changed. Reading Claude's changes is the fastest way to learn.</p>
+    </section>
+
+    <section>
+      <p class="eyebrow">TINY GLOSSARY</p>
+      <h2>Words you'll see</h2>
+      <dl>
+        <dt>string</dt><dd>Words inside quotes: <code>"Embersnoot"</code>. The game shows them.</dd>
+        <dt>number</dt><dd>A plain number, no quotes: <code>8</code>. The game can do maths with it.</dd>
+        <dt>list</dt><dd>Things inside <code>[ ]</code>, separated by commas, like your moves.</dd>
+        <dt>{ } block</dt><dd>A group of settings that belong together, like one move.</dd>
+        <dt>hex colour</dt><dd>A # and 6 letters/numbers: <code>"#ff8a24"</code> is orange.</dd>
+        <dt>comment</dt><dd>A line starting with <code>//</code>. A note for humans. The computer skips it.</dd>
+        <dt>reload</dt><dd>⌘R in the browser: makes the page read your files again.</dd>
+      </dl>
+    </section>
+  </main>
+</body>
+</html>
