@@ -69,7 +69,7 @@ const Battle = (() => {
 
   function bars() {
     // The bar's width is: puff left ÷ puff at the start × 100, as a percent.
-    $("ember-bar").style.width = (game.ember.puff / game.ember.max * 100) + "%";
+    $("ember-bar").style.width = Math.min(100, game.ember.puff / game.ember.max * 100) + "%";
     $("dew-bar").style.width = (game.dew.puff / game.dew.max * 100) + "%";
     $("ember-puff").textContent = `${Math.max(0, game.ember.puff)} / ${game.ember.max}`;
     $("dew-puff").textContent = `${Math.max(0, game.dew.puff)} / ${game.dew.max}`;
@@ -80,21 +80,25 @@ const Battle = (() => {
 
   function start() {
     const level = Lessons.level();
-    // Dewsnoot gets a little tougher each time Embersnoot levels up.
+    // Dewsnoot gets a little tougher each time Embersnoot levels up,
+    // until Level 8. After that his strength stays the same.
+    const L = Math.min(level, 8);
     game = {
       level,
       ember: { puff: 40, max: 40 },
-      dew: { puff: 30 + level * 4, max: 30 + level * 4 },
-      dewHit: 7 + Math.floor(level / 2),
-      dewSmart: Math.min(.85, .15 + level * .1),
+      dew: { puff: 30 + L * 4, max: 30 + L * 4 },
+      dewHit: 7 + Math.floor(L / 2),
+      dewSmart: Math.min(.85, .15 + L * .1),
       charged: false, dodging: false, dewShield: false, over: false,
       missStreak: 0, stands: 0,
     };
     Ember.setLevel(level); Ember.walkIn();
     $("rematch").hidden = true;
-    $("dew-level").textContent = level === 0 ? "gentle" : `tougher ×${level}`;
+    $("dew-level").textContent = L === 0 ? "gentle" : L === 8 ? "full strength" : `tougher ×${L}`;
     bars(); setButtons(false); lines = [];
     log("Dewsnoot waddles in to guard his garden…");
+    const c = Lessons.cheerLine();                           // your cheer, from practice/my-functions.js
+    if (c) log(`${S.trainerName || "You"}: “${c}”`);
     Dew.walkIn(() => { log(`Your turn. Pick one of ${S.name}'s moves below.`); setButtons(true); });
   }
 
@@ -213,7 +217,15 @@ const Battle = (() => {
     return false;
   }
 
-  return { init, start };
+  // For the Console quest: look at the game's notes, and add puff.
+  function state() { return game ? JSON.parse(JSON.stringify(game)) : null; }
+  function addPuff(n) {
+    if (!game || game.over || busy) return false;
+    game.ember.puff = Math.min(game.ember.max + 30, game.ember.puff + n);
+    bars(); Fx.pop("ember", `+${n}`, "heal"); Sound.play("heal"); return true;
+  }
+
+  return { init, start, state, addPuff };
 })();
 
 // ---- Flying effects, pop-up numbers, the action banner and heal sparkles ----

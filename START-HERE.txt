@@ -15,8 +15,10 @@ SNOOT PETS — START HERE
      GREEN = it worked.  RED = it tells you what to fix.
 
 3. FOLLOW THE QUESTS
-   They're under the arena in the game. Quest 2 helps you install VS Code,
-   the editor you'll use to change your pet.
+   They're under the arena in the game, in three tiers from easy to hard.
+   Quest 2 helps you install VS Code, the editor you'll use to change things.
+   Other files that are yours to change: my-lore.js, my-quests.js and the
+   practice folder (the quests tell you when).
 
 4. NEED HELP?
    Open guide.html, or ask Claude in the Code tab:

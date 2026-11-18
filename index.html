@@ -6,13 +6,13 @@
   <meta name="robots" content="noindex, nofollow">
   <title>Snoot Pets</title>
   <link rel="stylesheet" href="game-parts/styles.css">
-  <!-- This tiny script listens for typos in my-embersnoot.js,
-       so the red bar can say which line has the problem. -->
+  <!-- This tiny script listens for typos in YOUR files (my-… and practice/…),
+       so the red bar can say which file and line has the problem. -->
   <script>
     window.SNOOT_ERRORS = [];
     window.addEventListener("error", function (e) {
-      if (String(e.filename || "").indexOf("my-embersnoot.js") !== -1)
-        window.SNOOT_ERRORS.push({ line: e.lineno, message: e.message });
+      var m = String(e.filename || "").match(/(my-[a-z-]+\.js|practice\/[a-z-]+\.js)$/);
+      if (m) window.SNOOT_ERRORS.push({ file: m[1], line: e.lineno, message: e.message });
     });
   </script>
 </head>
@@ -27,7 +27,7 @@
       </nav>
     </header>
 
-    <p class="preview-banner" id="preview-banner" hidden>You're viewing the online preview. Your own copy, the one you can change, is in <b>Documents → Snoot-Pets</b> on your Mac.</p>
+    <p class="preview-banner" id="preview-banner" hidden>You're viewing the online version. To change your pet, edit the files in your own copy of the folder, then open its <b>index.html</b>.</p>
 
     <div class="whats-new" id="whats-new" role="status" hidden></div>
 
@@ -98,7 +98,8 @@
         <p class="eyebrow">LEARN BY DOING</p>
         <h2 id="quests-title">Quests</h2>
         <ol class="quest-list" id="quest-list"></ol>
-        <p class="small">Each quest you finish levels up <span class="pet-name">Embersnoot</span>, makes Dewsnoot a little tougher, and unlocks a page in your 📓 Notebook.</p>
+        <div class="my-quests" id="my-quests" hidden></div>
+        <p class="small">Each quest you finish levels up <span class="pet-name">Embersnoot</span> and unlocks a card in your 📓 Notebook. Dewsnoot gets tougher up to Level 8.</p>
       </div>
       <div class="quest-card" id="quest-card"></div>
     </section>
@@ -129,6 +130,10 @@
 
   <!-- The order matters: your pet's settings load first, then the game parts that use them. -->
   <script src="my-embersnoot.js"></script>
+  <script src="my-lore.js"></script>
+  <script src="my-quests.js"></script>
+  <script src="practice/bug-hunt.js"></script>
+  <script src="practice/my-functions.js"></script>
   <script src="game-parts/checker.js"></script>
   <script src="game-parts/sounds.js"></script>
   <script src="game-parts/notebook.js"></script>

@@ -48,7 +48,7 @@ const Checker = (() => {
 
     // 1) Could the browser read the file at all?
     if (!raw) {
-      const err = (window.SNOOT_ERRORS || [])[0];
+      const err = fileError("my-embersnoot.js");
       const where = err && err.line ? `Line ${err.line} of my-embersnoot.js` : "my-embersnoot.js";
       problems.push({
         where,
@@ -152,5 +152,50 @@ const Checker = (() => {
     return { settings: s, problems, fileBroken: false, raw };
   }
 
-  return { check, explainBrowserError };
+  // ---- Your other files: my-lore.js, my-quests.js and the practice folder ----
+  function fileError(file) { return (window.SNOOT_ERRORS || []).find(e => e.file === file); }
+  function unreadable(file, problems) {
+    const e = fileError(file);
+    problems.push({ file, where: e && e.line ? `Line ${e.line} of ${file}` : file,
+      msg: explainBrowserError(e && e.message) + " VS Code also puts a red squiggly line under the exact spot." });
+  }
+
+  function checkExtras() {
+    const problems = [], lore = [], quests = [];
+
+    // Lore cards
+    let rawLore = null; try { rawLore = MY_LORE; } catch (e) {}
+    if (rawLore === null) unreadable("my-lore.js", problems);
+    else if (!Array.isArray(rawLore)) problems.push({ file: "my-lore.js", where: "my-lore.js", msg: "MY_LORE should be a list inside [ ] brackets." });
+    else rawLore.forEach((c, i) => {
+      const where = `my-lore.js, card ${i + 1}`;
+      if (!c || typeof c.title !== "string" || typeof c.text !== "string" || !c.title.trim() || !c.text.trim()) {
+        problems.push({ file: "my-lore.js", where, msg: "Each lore card needs a title and a text, both inside quotes." }); return;
+      }
+      let u = Number(c.unlockAt);
+      if (!Number.isInteger(u) || u < 1 || u > 15) {
+        problems.push({ file: "my-lore.js", where, msg: `unlockAt should be a whole number from 1 to 15 (no quotes). The game used ${Number.isFinite(u) ? Math.min(15, Math.max(1, Math.round(u))) : 15}.` });
+        u = Number.isFinite(u) ? Math.min(15, Math.max(1, Math.round(u))) : 15;
+      }
+      lore.push({ title: c.title.trim().slice(0, 60), text: c.text.trim().slice(0, 700), unlockAt: u });
+    });
+
+    // Your own quests
+    let rawQ = null; try { rawQ = MY_QUESTS; } catch (e) {}
+    if (rawQ === null) unreadable("my-quests.js", problems);
+    else if (!Array.isArray(rawQ)) problems.push({ file: "my-quests.js", where: "my-quests.js", msg: "MY_QUESTS should be a list inside [ ] brackets." });
+    else rawQ.slice(0, 20).forEach((q, i) => {
+      const where = `my-quests.js, quest ${i + 1}`;
+      if (!q || typeof q.title !== "string" || !q.title.trim()) { problems.push({ file: "my-quests.js", where, msg: 'Each quest needs a title in quotes, like  title: "Six moves",' }); return; }
+      if (typeof q.check !== "function") { problems.push({ file: "my-quests.js", where, msg: "check should be a tiny function, like  check: s => s.moves.length >= 6" }); return; }
+      quests.push({ title: q.title.trim().slice(0, 50), hint: typeof q.hint === "string" ? q.hint.trim().slice(0, 120) : "", check: q.check });
+    });
+
+    // Practice files: only typos count here. Wrong answers are the puzzle, not a problem!
+    for (const f of ["practice/bug-hunt.js", "practice/my-functions.js"]) if (fileError(f)) unreadable(f, problems);
+
+    return { lore, quests, problems };
+  }
+
+  return { check, checkExtras, explainBrowserError };
 })();

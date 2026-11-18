@@ -1,7 +1,7 @@
 // =========================================================
 //  NOTEBOOK — the cards in your 📓 Notebook.
 //
-//  Cards are grouped into 4 chapters. Every card has the same
+//  Cards are grouped into 5 chapters (plus your lore, from my-lore.js). Every card has the same
 //  three parts:  WHAT IT IS  →  EXAMPLE  →  REMEMBER
 //
 //  quest: null      → the card is always open (things learned while building)
@@ -42,6 +42,13 @@ const NOTEBOOK_CHAPTERS = [
         what: "Each move rolls a random number from 0 to 100. If the roll is under the move's <code>chance</code>, the move works.",
         example: "<pre>if (Math.random() * 100 < move.chance) {\n  // it lands\n}</pre><p>Flare Stamp (chance 70) once missed 3 times in a row. That happens about 3 times in 100.</p>",
         remember: "Random doesn't mean evenly spread out. Games add quiet fairness rules. Ours: you can't miss more than twice in a row.",
+      },
+      {
+        id: "console", quest: "peek", from: "Quest 10",
+        title: "The Console: talking to a page",
+        what: "Every browser has hidden <b>developer tools</b>. Its <b>Console</b> is a box where you type JavaScript, and it runs right inside the page.",
+        example: "<pre>snoot.state()       // look at the game's notes\nsnoot.givePuff(10)  // change them</pre>",
+        remember: "A website is code running on your own computer, so you can peek inside it.",
       },
     ],
     check: {
@@ -128,6 +135,20 @@ const NOTEBOOK_CHAPTERS = [
         example: '<pre>moves: [\n  { name: "Spark Flick", … },\n  { name: "Kindle", … },\n]</pre><p>The game makes one button for each block in the list.</p>',
         remember: "Add a block, get a button. The code doesn't care whether you have 4 moves or 6.",
       },
+      {
+        id: "functions", quest: "functions", from: "Quest 12",
+        title: "Functions: little machines",
+        what: "A <b>function</b> is a little machine: you give it something, and it gives something back.",
+        example: "<pre>function powerUp(power) {\n  return power + 5;\n}\npowerUp(8)   // gives 13</pre>",
+        remember: "A name, the input in ( ), and return for what comes out.",
+      },
+      {
+        id: "questdata", quest: "myquest", from: "Quest 15",
+        title: "A quest is just data",
+        what: "Each quest in this game is a small { } block: a title, a hint, and a tiny <b>check</b> function that answers true or false.",
+        example: '<pre>{ title: "Six moves",\n  check: s => s.moves.length >= 6 }</pre><p><code>s => …</code> means: given your settings (s), answer this.</p>',
+        remember: "Big programs are built from lots of small pieces like this.",
+      },
     ],
     check: {
       q: "Which line is written correctly?",
@@ -147,6 +168,52 @@ const NOTEBOOK_CHAPTERS = [
         remember: "Every mistake you can predict is one you can explain kindly.",
       },
       {
+        id: "editor", quest: "vscode", from: "Quest 2",
+        title: "Code editors vs. word processors",
+        what: "Word processors (TextEdit, Pages) “prettify” text and swap \" for curly “ ”. A <b>code editor</b> (VS Code) keeps your text exactly as typed.",
+        example: "<p>VS Code also colours the code so the parts stand out, and puts red squiggles under mistakes.</p>",
+        remember: "Write code in a code editor. It's like using a ruler instead of eyeballing it.",
+      },
+      {
+        id: "git", quest: "git", from: "Quest 8",
+        title: "Save points with Git",
+        what: "<b>Git</b> takes snapshots of your whole folder. Each snapshot is a <b>commit</b>, with a short message saying what changed.",
+        example: "<pre>“First save point”\n“Blue flames and new move”\n“Fixed the typo in Kindle”</pre><p>Broke something? Jump back to an earlier commit.</p>",
+        remember: "Commit often, with clear messages. It's an undo button for your whole project.",
+      },
+      {
+        id: "diff", quest: "changes", from: "Quest 9",
+        title: "Diffs: seeing exactly what changed",
+        what: "A <b>diff</b> shows exactly what changed between two versions: <b>red</b> lines were removed, <b>green</b> lines were added.",
+        example: '<pre>- power: 8,\n+ power: 10,</pre>',
+        remember: "Reading the diff is how you check what Claude, or anyone, really changed.",
+      },
+      {
+        id: "debugging", quest: "bughunt", from: "Quest 11",
+        title: "Debugging: mind the gap",
+        what: "<b>Debugging</b> means finding out why code does something different from what it should.",
+        example: "<p>The note said “add 5”. The code said <code>puff - 5</code>. Where the note and the code disagree, that's the bug.</p>",
+        remember: "Compare what the code SHOULD do with what it DOES. The bug lives in the gap.",
+      },
+    ],
+    check: {
+      q: "What does a Git commit (a save point) do?",
+      options: ["Uploads your files to the internet", "Saves a snapshot of your project that you can go back to", "Deletes your old versions"],
+      answer: 1,
+      why: "A commit is a save point on your own computer. A push is the separate step that uploads it to GitHub.",
+    },
+  },
+  {
+    id: "ai", title: "Working with AI", icon: "🤖",
+    cards: [
+      {
+        id: "prompting", quest: "claude", from: "Quest 7",
+        title: "How to ask an AI for code",
+        what: "A good request says <b>what to change</b>, <b>what to leave alone</b>, and <b>how to explain it</b>.",
+        example: "<p class=\"nb-quote\">“Change victoryLine in my-embersnoot.js. Change nothing else. Explain what you did in two plain sentences.”</p>",
+        remember: "You don't need to know the code to steer it. Say clearly what you want, then read what changed.",
+      },
+      {
         id: "brief", quest: null, from: "Round 3: Codex's painting",
         title: "Briefs: making two people's work fit",
         what: "A <b>brief</b> is a set of exact instructions, so someone else's work slots into yours. Claude wrote one; Codex painted to it.",
@@ -161,32 +228,25 @@ const NOTEBOOK_CHAPTERS = [
         remember: "Whoever wrote something is the worst at spotting its mistakes, AIs included. Ask for a second pair of eyes.",
       },
       {
-        id: "editor", quest: "vscode", from: "Quest 2",
-        title: "Code editors vs. word processors",
-        what: "Word processors (TextEdit, Pages) “prettify” text and swap \" for curly “ ”. A <b>code editor</b> (VS Code) keeps your text exactly as typed.",
-        example: "<p>VS Code also colours the code so the parts stand out, and puts red squiggles under mistakes.</p>",
-        remember: "Write code in a code editor. It's like using a ruler instead of eyeballing it.",
+        id: "subagent", quest: "subagent", from: "Quest 13",
+        title: "Subagents: helpers with a job",
+        what: "A <b>subagent</b> is a helper AI with its own job description. The main AI hands it a task and gets a report back.",
+        example: "<pre>---\nname: snoot-reviewer\ndescription: Reviews Snoot Pets changes\n---\nExplain problems in plain words.</pre>",
+        remember: "A clear job description is the whole trick.",
       },
       {
-        id: "prompting", quest: "claude", from: "Quest 7",
-        title: "How to ask an AI for code",
-        what: "A good request says <b>what to change</b>, <b>what to leave alone</b>, and <b>how to explain it</b>.",
-        example: "<p class=\"nb-quote\">“Change victoryLine in my-embersnoot.js. Change nothing else. Explain what you did in two plain sentences.”</p>",
-        remember: "You don't need to know the code to steer it. Say clearly what you want, then read what changed.",
-      },
-      {
-        id: "git", quest: "git", from: "Quest 8",
-        title: "Save points with Git",
-        what: "<b>Git</b> takes snapshots of your whole folder. Each snapshot is a <b>commit</b>, with a short message saying what changed.",
-        example: "<pre>“First save point”\n“Blue flames and new move”\n“Fixed the typo in Kindle”</pre><p>Broke something? Jump back to an earlier commit.</p>",
-        remember: "Commit often, with clear messages. It's an undo button for your whole project.",
+        id: "cli", quest: "terminal", from: "Quest 14",
+        title: "The terminal: programs talking to programs",
+        what: "The <b>terminal</b> (command line) lets you, or an AI, run programs by typing commands.",
+        example: '<pre>codex exec "What does chooseDewMove do?"</pre><p>Claude sends one message, Codex prints one answer, repeat.</p>',
+        remember: "One message in, one answer out. That's how AIs can talk to each other.",
       },
     ],
     check: {
-      q: "What's the best way to ask Claude for a change?",
-      options: ["“Make it better.”", "Say what to change, what to leave alone, and ask for a plain explanation", "Paste in all the code and say “fix”"],
+      q: "What is a subagent?",
+      options: ["A second app you have to install", "A helper AI with its own job description that the main AI can hand work to", "A backup copy of your project"],
       answer: 1,
-      why: "Clear requests get clear results, and asking for an explanation turns every change into a mini lesson.",
+      why: "A subagent is just a short file describing a job. The main AI delegates to it and gets a report back.",
     },
   },
 ];
