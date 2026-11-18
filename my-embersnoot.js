@@ -36,26 +36,20 @@ const MY_EMBERSNOOT = {
   trainerName: "",
   teamName: "Team Flame",
 
-  // ---- COLOURS -------------------------------------------
+  // ---- FIRE COLOURS --------------------------------------
+  // Your pet's body is painted art (game-parts/art/embersnoot.png).
+  // These colours paint everything the CODE draws around it:
+  // its sparks, its glow, its kindle shine and the sparks it throws.
   // Colours are "hex codes": a # followed by 6 letters/numbers.
   // To find new ones, search "color picker" in your browser.
   colors: {
-    body:   "#5b4a52",   // soot-plum fur
-    belly:  "#8c706b",   // lighter tummy
-    flame:  "#ff8a24",   // outer part of each flame
-    core:   "#ffd256",   // hot centre of each flame
-    cracks: "#ffb347",   // the glowing cracks in its skin
-    eyes:   "#8fe3ff",   // eye colour
+    flame:  "#ff8a24",   // outer sparks and glow
+    core:   "#ffd256",   // the hottest, brightest sparks
   },
-
-  // ---- SHAPE ---------------------------------------------
-  // Plain numbers (no quotes) are values the game can do maths with.
-  crownFlames: 3,      // flames on its head: 1 to 5
-  tailLength: 1,       // 0.6 = stubby,  1 = normal,  1.4 = very long
-  earSize: 1,          // 0.7 = small,   1 = normal,  1.3 = big
 
   // ---- BATTLE MOVES --------------------------------------
   // This is a "list" (the [ ] brackets). Each move is one { } block.
+  // Plain numbers (no quotes) are values the game can do maths with.
   //   kind:   "hit"    = knocks puff off Dewsnoot
   //           "dodge"  = Dewsnoot's next move will probably miss
   //           "charge" = your next hit does double
@@ -71,8 +65,7 @@ const MY_EMBERSNOOT = {
 
   // ---- 🔒 LOCKED EXTRAS ----------------------------------
   // These only switch on when Embersnoot reaches the level shown.
-  // Finish quests in the game to level up.
-  tailFire: 1,         // 🔒 Level 3: size of the tail flame, 1 to 2
+  // Finish quests in the game to level up. (Skins are coming later.)
   auraColor: "",       // 🔒 Level 5: a glow around your pet, like "#ff4fa0"
 
 };

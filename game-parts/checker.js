@@ -10,20 +10,13 @@ const DEFAULT_EMBERSNOOT = {
   victoryLine: "Hah! Still warm.",
   trainerName: "",
   teamName: "Team Flame",
-  colors: {
-    body: "#5b4a52", belly: "#8c706b", flame: "#ff8a24",
-    core: "#ffd256", cracks: "#ffb347", eyes: "#8fe3ff",
-  },
-  crownFlames: 3,
-  tailLength: 1,
-  earSize: 1,
+  colors: { flame: "#ff8a24", core: "#ffd256" },
   moves: [
     { name: "Spark Flick", kind: "hit",    power: 8,  chance: 95 },
     { name: "Flare Stamp", kind: "hit",    power: 13, chance: 70 },
     { name: "Smoke Puff",  kind: "dodge",  power: 0,  chance: 100 },
     { name: "Kindle",      kind: "charge", power: 0,  chance: 100 },
   ],
-  tailFire: 1,
   auraColor: "",
 };
 
@@ -126,9 +119,6 @@ const Checker = (() => {
       }
     } else problems.push({ where: "colors", msg: "The colors { } block is missing or broken." });
 
-    const cf = num("crownFlames", raw.crownFlames, 1, 5, true); if (cf !== null) s.crownFlames = cf;
-    const tl = num("tailLength", raw.tailLength, 0.6, 1.4); if (tl !== null) s.tailLength = tl;
-    const es = num("earSize", raw.earSize, 0.7, 1.3); if (es !== null) s.earSize = es;
 
     if (Array.isArray(raw.moves) && raw.moves.length) {
       if (raw.moves.length > 6) problems.push({ where: "moves", msg: `You have ${raw.moves.length} moves. The most is 6, so the game used the first 6.` });
@@ -157,7 +147,6 @@ const Checker = (() => {
       if (moves.length) s.moves = moves;
     } else problems.push({ where: "moves", msg: "The moves [ ] list is missing or empty. Embersnoot needs at least one move." });
 
-    const tf = num("tailFire", raw.tailFire ?? 1, 1, 2); if (tf !== null) s.tailFire = tf;
     if (raw.auraColor) { const a = color("auraColor", raw.auraColor); if (a) s.auraColor = a; }
 
     return { settings: s, problems, fileBroken: false, raw };

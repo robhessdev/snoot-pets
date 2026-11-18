@@ -87,7 +87,7 @@ const Battle = (() => {
       charged: false, dodging: false, dewShield: false, over: false,
       missStreak: 0, stands: 0,
     };
-    Ember.reset(); Ember.setLevel(level);
+    Ember.setLevel(level); Ember.walkIn();
     $("rematch").hidden = true;
     $("dew-level").textContent = level === 0 ? "gentle" : `tougher ×${level}`;
     bars(); setButtons(false); lines = [];
@@ -106,7 +106,7 @@ const Battle = (() => {
 
     Fx.banner(`🔥 ${S.name} uses ${m.name}!`, "ember");
     if (m.kind === "hit") {
-      Ember.play("attack"); Sound.play(m.power >= 12 ? "flare" : "spark"); Fx.shoot("ember");
+      Ember.play("attack"); Sound.play(m.power >= 12 ? "flare" : "spark"); Fx.shoot("ember", S.colors);
       await wait(420);
       if (!lands) { Fx.pop("dew", "MISS", "miss"); Sound.play("miss"); log(`${m.name} missed! Dewsnoot blinks, unimpressed.`); }
       else {
@@ -218,13 +218,14 @@ const Fx = (() => {
   }
 
   // Sparks fly from Embersnoot (right) to Dewsnoot (left); dew drops the other way.
-  function shoot(from) {
+  function shoot(from, colors) {
     const layer = $("fx");
     const s = from === "ember" ? centre("ember", .2, .45) : centre("dew", .7, .45);
     const t = from === "ember" ? centre("dew", .5, .55) : centre("ember", .5, .6);
     for (let i = 0; i < 6; i++) {
       const d = document.createElement("span");
       d.className = from === "ember" ? "fx-spark" : "fx-drop";
+      if (colors) d.style.background = `radial-gradient(circle, #fffbe6, ${colors.core} 40%, ${colors.flame} 60%, transparent 72%)`;
       layer.append(d);
       const j = () => (Math.random() - .5) * 30;
       d.animate([

@@ -58,12 +58,12 @@ const Lessons = (() => {
       check: () => fileOK() && S.name !== D.name,
     },
     {
-      id: "color", title: "Pick a new flame colour",
-      why: 'Colours in code are <b>hex codes</b>: a # and 6 letters or numbers. <code>"#ff0000"</code> is red, <code>"#00aaff"</code> is sky blue.',
+      id: "color", title: "Pick a new fire colour",
+      why: 'Colours in code are <b>hex codes</b>: a # and 6 letters or numbers. <code>"#ff0000"</code> is red, <code>"#00aaff"</code> is sky blue. Your colour paints the sparks, glow and kindle shine around your pet.',
       steps: [
         'Find <code>flame: "#ff8a24",</code> inside the <b>colors</b> block.',
         "Search “color picker” in your browser, choose a colour, and copy its hex code.",
-        "Paste it between the quotes. Keep the #. Save (⌘S), then reload here (⌘R).",
+        "Paste it between the quotes. Keep the #. Save (⌘S), then reload here (⌘R). Watch the sparks, and try Kindle to see the glow.",
       ],
       check: () => fileOK() && (S.colors.flame !== D.colors.flame || S.colors.core !== D.colors.core),
     },
@@ -114,7 +114,6 @@ const Lessons = (() => {
   const level = () => QUESTS.filter(q => progress.done[q.id]).length;
 
   const UNLOCKS = {
-    3: "tailFire unlocked! Try  tailFire: 2,  in my-embersnoot.js for a bigger tail flame.",
     5: 'auraColor unlocked! Try  auraColor: "#ff4fa0",  in my-embersnoot.js for a glow.',
     7: "One quest left: save points with Git.",
     8: "Every quest done! Free play is open. The ideas are in the quest panel.",
@@ -239,6 +238,12 @@ const Lessons = (() => {
     drawNotebook();
   }
 
+  const hasCard = questId => C.some(ch => ch.cards.some(c => c.quest === questId));
+  function openNotebookAt(questId) {
+    C.forEach((ch, i) => ch.cards.forEach((c, j) => { if (c.quest === questId) { nbCh = i; nbIdx = j; } }));
+    $("notebook").hidden = false; drawNotebook(); $("notebook-close").focus();
+  }
+
   function openNotebook() {
     // Start at the first new card, if there is one.
     const seen = progress.seen || [];
@@ -283,14 +288,22 @@ const Lessons = (() => {
       const done = !!progress.done[q.id];
       li.className = "quest" + (done ? " done" : "") + (q === current ? " current" : "");
       li.innerHTML = `<span class="q-mark">${done ? "✓" : i + 1}</span><span class="q-title">${q.title}</span>`;
+      // A finished quest becomes a button that opens its Notebook card.
+      if (done && hasCard(q.id)) {
+        const b = document.createElement("button"); b.type = "button";
+        b.title = "Open this quest's Notebook card";
+        b.innerHTML = li.innerHTML + '<span class="q-nb">📓</span>';
+        b.addEventListener("click", () => openNotebookAt(q.id));
+        li.innerHTML = ""; li.append(b);
+      }
       list.append(li);
     });
     const card = $("quest-card");
     if (!current) {
       card.innerHTML = `<p class="eyebrow">FREE PLAY</p><h3>You finished every quest.</h3>
         <p>Embersnoot is yours to keep shaping. Some ideas, from easy to bold:</p>
-        <ul class="ideas"><li>Try <code>crownFlames: 5,</code> and <code>tailLength: 1.4,</code></li>
-        <li>Give it ice-blue flames: <code>flame: "#3fb8ff",</code> <code>core: "#e8fbff",</code></li>
+        <ul class="ideas"><li>Give it ice-blue sparks: <code>flame: "#3fb8ff",</code> <code>core: "#e8fbff",</code></li>
+        <li>Set an <code>auraColor</code> and invent a sixth move</li>
         <li>Ask Claude in the Code tab: “Add a new move kind called heal that gives Embersnoot back puff. Explain each line you add.”</li>
         <li>Ask Claude: “Add a second opponent. Keep it simple and explain the plan before you change anything.”</li></ul>`;
       return;
@@ -388,6 +401,22 @@ const Lessons = (() => {
       "Checking what people type and explaining problems kindly is a big part of real software.");
   }
 
+  // ---- 🆕 What's new: shown once after each update round ----
+  const VERSION = "round-3";
+  const WHATS_NEW = [
+    "Embersnoot is now <b>painted</b>, by Codex, to match Dewsnoot's style. It walks into the arena too.",
+    "Your <b>fire colours</b> now paint the sparks, glow, kindle shine and the sparks it throws. (The painted body colours and shape settings were retired.)",
+    "Click a <b>finished quest</b> (✓) to open its Notebook card.",
+  ];
+  function showWhatsNew() {
+    if (progress.seenVersion === VERSION) return;
+    if (!progress.seenVersion && !progress.wins && !Object.keys(progress.done).length) { progress.seenVersion = VERSION; save(); return; }   // brand-new player: nothing is "new"
+    const box = $("whats-new");
+    box.innerHTML = `<div><p><b>🆕 What's new</b></p><ul>${WHATS_NEW.map(w => `<li>${w}</li>`).join("")}</ul></div><button type="button" class="chip" id="whats-new-ok">Got it</button>`;
+    box.hidden = false;
+    $("whats-new-ok").addEventListener("click", () => { progress.seenVersion = VERSION; save(); box.hidden = true; });
+  }
+
   function initStartOver() {
     const b = $("start-over"); let armed = false;
     b.addEventListener("click", () => {
@@ -414,6 +443,7 @@ const Lessons = (() => {
     document.querySelectorAll("[data-peek]").forEach(b => b.addEventListener("click", () => peekTopic(b.dataset.peek)));
     $("peek-close").addEventListener("click", () => $("peek").hidden = true);
     initStartOver();
+    showWhatsNew();
     Sound.bindToggle($("sound-toggle"));
     renderNotebook();
     $("notebook-open").addEventListener("click", openNotebook);

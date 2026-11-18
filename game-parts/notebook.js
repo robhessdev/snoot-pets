@@ -72,8 +72,8 @@ const NOTEBOOK_CHAPTERS = [
         id: "twoways", quest: null, from: "Designing the pets",
         title: "Painted art vs. drawn by code",
         what: "<b>Painted</b> art is a picture file: to change it, someone paints new frames. Art <b>drawn by code</b> is made from shapes and numbers, many times a second.",
-        example: "<p>Dewsnoot = painted (a .png file).<br>Your pet, for now = drawn by code, so changing a number in your file changes its shape.</p>",
-        remember: "Painted art looks richer. Code art is easier to change. Many games mix both.",
+        example: "<p>Both pets = painted (.png sprite sheets).<br>The sparks, glow and pop-up numbers = drawn by code, in the colours from your file.</p><p>Your pet started out drawn by code. That first version is still saved in Git.</p>",
+        remember: "Painted art looks richer. Code art is easier to change. This game layers both: code effects on top of painted art.",
       },
       {
         id: "mirror", quest: null, from: "Round 1",
@@ -145,6 +145,13 @@ const NOTEBOOK_CHAPTERS = [
         what: "Testers try to break things before anyone else does, then check that the problem is handled well.",
         example: "<p>Claude put curly quotes, a colour without a #, and a word without quotes into your file on purpose, then checked that the red bar explained each one. That caught 2 real bugs.</p>",
         remember: "Every mistake you can predict is one you can explain kindly.",
+      },
+      {
+        id: "brief", quest: null, from: "Round 3: Codex's painting",
+        title: "Briefs: making two people's work fit",
+        what: "A <b>brief</b> is a set of exact instructions, so someone else's work slots into yours. Claude wrote one; Codex painted to it.",
+        example: "<p>The brief set the exact frame size (192×208), the facing direction (left) and where the paws sit (y = 189). Codex's 50 frames dropped into the game first try.</p>",
+        remember: "Be exact about the parts that must fit, and leave freedom everywhere else.",
       },
       {
         id: "editor", quest: "vscode", from: "Quest 2",

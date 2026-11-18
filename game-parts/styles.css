@@ -19,6 +19,8 @@
 }
 
 * { box-sizing: border-box; }
+/* Safety rule: anything switched to "hidden" stays hidden, whatever other styles say. */
+[hidden] { display: none !important; }
 body {
   margin: 0; background: var(--paper); color: var(--ink);
   font: 16px/1.55 ui-rounded, "Avenir Next", Avenir, "Segoe UI", system-ui, sans-serif;
@@ -53,7 +55,7 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .
 
 /* arena */
 .arena-card { background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 16px; box-shadow: 0 14px 34px rgba(70, 45, 30, .08); }
-.arena { position: relative; display: grid; grid-template-columns: 1fr 1fr; border-radius: 16px; overflow: hidden; min-height: 330px; }
+.arena { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); border-radius: 16px; overflow: hidden; min-height: 330px; }
 .side { position: relative; padding: 14px 16px 0; display: flex; flex-direction: column; }
 .side-ember { background: radial-gradient(90% 60% at 40% 100%, #6b3220 0 40%, transparent 41%), linear-gradient(#2b1f24, #4a2b22); color: #ffe9d6; }
 .side-dew { background: radial-gradient(100% 55% at 55% 102%, #9cbf7a 0 44%, transparent 45%), linear-gradient(#dde9e2, #f0eed8); color: #2c3a2c; }
@@ -67,8 +69,8 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .
 .fill-ember { background: linear-gradient(90deg, #ff6b2b, #ffd256); }
 .fill-dew { background: linear-gradient(90deg, #5f9a6a, #9fd3e6); }
 .puff { font-size: .75rem; opacity: .75; margin-top: 2px; }
-/* Embersnoot is drawn facing right; scaleX(-1) mirrors it to face left, toward Dewsnoot. */
-.ember-canvas { display: block; width: 100%; max-width: 340px; aspect-ratio: 300 / 260; margin: auto auto 0; transform: scaleX(-1); }
+/* Codex painted Embersnoot facing left, toward Dewsnoot, so no mirroring is needed. */
+.ember-canvas { display: block; width: 260px; height: 280px; margin: auto auto 0; }
 .dew-stage { margin-top: auto; height: 240px; display: flex; align-items: flex-end; justify-content: center; }
 .dew-mover { position: relative; width: 192px; height: 208px; margin-bottom: 6px; }
 /* Dewsnoot's art faces left; the minus sign mirrors him so he faces right, toward your pet. */
@@ -213,6 +215,16 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .
 .nb-feedback.good { color: var(--good); }
 .nb-feedback.bad { color: var(--bad); }
 
+/* what's new note */
+.whats-new { margin: 14px 0 0; padding: 12px 14px; border-radius: 14px; background: #fff7e0; border: 2px solid #f1d27a; color: #4a3a12; display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; }
+/* "display: flex" above would beat the page's hidden switch, so this line makes hidden win. */
+.whats-new[hidden] { display: none; }
+.whats-new ul { margin: 6px 0 0; padding-left: 18px; }
+.whats-new p { margin: 0; }
+.quest.done button { all: unset; cursor: pointer; display: flex; gap: 10px; align-items: center; width: 100%; }
+.quest.done button:hover .q-title { text-decoration: underline; }
+.q-nb { margin-left: auto; font-size: .8rem; opacity: .7; }
+
 /* save-point reminder */
 .save-reminder { margin-top: 12px; padding: 12px 14px; border-radius: 14px; background: #eef3fb; border: 2px solid #8fb1e3; color: #23395e; }
 .save-reminder p { margin: 0 0 8px; }
@@ -232,7 +244,10 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .
   .arena { min-height: 260px; }
   .side { padding: 10px 10px 0; }
   .dew-stage { height: 170px; }
-  .dew-scale { transform: scale(-.78, .78); }
+  .dew-mover { width: 150px; height: 162px; }
+  .dew-scale { transform: scale(-.78, .78); transform-origin: 50% 0; margin-left: -21px; }
+  .ember-canvas { width: 160px; height: 172px; }
+  .team-badge { font-size: .56rem; letter-spacing: .04em; padding: 2px 7px; }
   .dew-mover { margin-bottom: 0; }
   .hero h1 { margin-top: 18px; }
 }
