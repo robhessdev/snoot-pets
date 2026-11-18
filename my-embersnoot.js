@@ -2,8 +2,9 @@
 //   🔥  MY EMBERSNOOT  —  THIS IS YOUR PET.  CHANGE THIS FILE.
 // =========================================================
 //
-//   Everything about Embersnoot lives in this one file:
-//   its name, colours, shape and battle moves.
+//   This file is where you shape Embersnoot: its name, your name
+//   and team, its victory line, its battle moves and its fire colours.
+//   (Its body is painted art, made by Codex.)
 //
 //   HOW TO MAKE A CHANGE
 //     1. Change something below. (Start with the name.)

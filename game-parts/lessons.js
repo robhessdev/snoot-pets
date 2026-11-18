@@ -402,10 +402,11 @@ const Lessons = (() => {
   }
 
   // ---- 🆕 What's new: shown once after each update round ----
-  const VERSION = "round-3";
+  const VERSION = "round-4";
   const WHATS_NEW = [
     "Embersnoot is now <b>painted</b>, by Codex, to match Dewsnoot's style. It walks into the arena too.",
-    "Your <b>fire colours</b> now paint the sparks, glow, kindle shine and the sparks it throws. (The painted body colours and shape settings were retired.)",
+    "Your <b>fire colours</b> paint the sparks, glow, kindle halos and the sparks it throws.",
+    "<b>Kindle</b> is now saved until a hit lands. A miss no longer wastes it (Dewsnoot's dew can still put it out).",
     "Click a <b>finished quest</b> (✓) to open its Notebook card.",
   ];
   function showWhatsNew() {

@@ -252,5 +252,5 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .
   .hero h1 { margin-top: 18px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  * { transition: none !important; scroll-behavior: auto !important; }
+  * { transition: none !important; scroll-behavior: auto !important; animation: none !important; }
 }

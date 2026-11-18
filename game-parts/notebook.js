@@ -26,7 +26,7 @@ const NOTEBOOK_CHAPTERS = [
         id: "saving", quest: null, from: "Round 1",
         title: "Two kinds of saving",
         what: "<b>⌘S saves a file</b> for good, like a document. <b>The browser saves progress</b> by itself, in a small storage box called <b>localStorage</b>.",
-        example: "<p>Your pet's colours → saved in <code>my-embersnoot.js</code> (⌘S).<br>Your quests and level → saved in this browser, automatically.</p>",
+        example: "<p>Your pet's name, moves and fire colours → saved in <code>my-embersnoot.js</code> (⌘S).<br>Your quests and level → saved in this browser, automatically.</p>",
         remember: "Files are the real, permanent save. Browser storage belongs to one browser on one computer.",
       },
       {
@@ -152,6 +152,13 @@ const NOTEBOOK_CHAPTERS = [
         what: "A <b>brief</b> is a set of exact instructions, so someone else's work slots into yours. Claude wrote one; Codex painted to it.",
         example: "<p>The brief set the exact frame size (192×208), the facing direction (left) and where the paws sit (y = 189). Codex's 50 frames dropped into the game first try.</p>",
         remember: "Be exact about the parts that must fit, and leave freedom everywhere else.",
+      },
+      {
+        id: "review", quest: null, from: "Round 4: Codex's review",
+        title: "Second opinions catch different things",
+        what: "A <b>code review</b> is someone else reading your work to find problems. A different reviewer spots different problems.",
+        example: "<p>Claude's tests caught things that only show up when the game runs, like the phone layout. Codex's review caught a rule that didn't match its own words: Kindle promised your next <i>hit</i> doubles, but a miss used it up.</p>",
+        remember: "Whoever wrote something is the worst at spotting its mistakes, AIs included. Ask for a second pair of eyes.",
       },
       {
         id: "editor", quest: "vscode", from: "Quest 2",

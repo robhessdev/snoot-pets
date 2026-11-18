@@ -4,8 +4,11 @@
 //   1. PAINTED ART: Codex painted 50 animation frames into one
 //      sprite sheet (art/embersnoot.png). We show one frame at a
 //      time, like a flip book, the same way Dewsnoot works.
-//   2. CODE EFFECTS: the sparks, glow and kindle shine are drawn
+//   2. CODE EFFECTS: the sparks, glow and kindle halos are drawn
 //      by code in YOUR colours from my-embersnoot.js.
+//
+//  If your Mac's "Reduce motion" setting is on, Embersnoot stands
+//  still when resting, and there are no drifting sparks.
 //
 //  The first, code-drawn Embersnoot is still saved in Git
 //  (save point #1), if you ever want to look back at it.
@@ -88,7 +91,7 @@ const Ember = (() => {
     st.t += dt; st.flash = Math.max(0, st.flash - dt * 2.5);
     // step the flip book
     const a = ROWS[st.anim];
-    st.clock += dt * 1000 * (reduced ? .5 : 1);
+    if (reduced && a.loop) { st.frame = 0; st.clock = 0; } else st.clock += dt * 1000 * (reduced ? .5 : 1);
     while (st.clock >= a.ms) {
       st.clock -= a.ms; st.frame++;
       if (st.frame >= a.frames) {                 // reached the LAST frame
@@ -126,15 +129,25 @@ const Ember = (() => {
       ctx.fillStyle = g; ctx.fillRect(0, 0, LW, LH);
     }
 
-    // the painted frame (drawn on a small side canvas first, so it can be tinted)
+    // the painted frame (drawn on a small side canvas first, so the hurt flash can whiten it)
     if (sheet.complete && sheet.naturalWidth) {
       const a = ROWS[st.anim];
       offCtx.globalCompositeOperation = "source-over";
       offCtx.clearRect(0, 0, CELL_W, CELL_H);
       offCtx.drawImage(sheet, st.frame * CELL_W, a.row * CELL_H, CELL_W, CELL_H, 0, 0, CELL_W, CELL_H);
-      if (kindling) { offCtx.globalCompositeOperation = "source-atop"; offCtx.fillStyle = rgba(c.flame, .16 + .06 * Math.sin(st.t * 8) * AMB); offCtx.fillRect(0, 0, CELL_W, CELL_H); }
       if (st.flash > 0) { offCtx.globalCompositeOperation = "source-atop"; offCtx.fillStyle = `rgba(255,255,255,${st.flash * .55})`; offCtx.fillRect(0, 0, CELL_W, CELL_H); }
       ctx.drawImage(off, OX, OY);
+      // Kindle: soft halos on the flames only, in your colours, so the painted fur stays clean.
+      // ("lighter" adds light on top, like shining a torch on the flames.)
+      if (kindling) {
+        ctx.save(); ctx.globalCompositeOperation = "lighter";
+        for (const [p, r] of [[CROWN, 34], [TAIL, 24]]) {
+          const g = ctx.createRadialGradient(OX + p.x, OY + p.y, 2, OX + p.x, OY + p.y, r);
+          g.addColorStop(0, rgba(c.core, .35)); g.addColorStop(1, rgba(c.flame, 0));
+          ctx.fillStyle = g; ctx.fillRect(OX + p.x - r, OY + p.y - r, r * 2, r * 2);
+        }
+        ctx.restore();
+      }
     }
 
     // sparks, in a mix of your flame and core colours

@@ -5,8 +5,10 @@ SNOOT PETS — START HERE
    Double-click  index.html  to open the game in your browser.
 
 2. YOUR PET IS YOURS TO CHANGE
-   Your fire pet lives in one file:  my-embersnoot.js
-   Its name, colours, shape and moves are all in there.
+   Your fire pet's settings live in one file:  my-embersnoot.js
+   Its name, your name and team, its victory line, its moves and its
+   fire colours (sparks and glow) are all in there.
+   Its body is painted art, so the file doesn't change its shape.
 
    The loop you'll use every time:
      change it  ->  save (Cmd+S)  ->  reload the game (Cmd+R)  ->  read the bar at the top

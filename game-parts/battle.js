@@ -5,6 +5,9 @@
 //  Fire is strong against ferns, but dew puts fire out,
 //  so neither pet always wins.
 //
+//  Kindle doubles your next hit that LANDS. A miss doesn't waste it,
+//  but Dewsnoot's dew can put it out.
+//
 //  Two fairness rules:
 //   • You can't miss more than twice in a row.
 //   • Dewsnoot can only use Stubborn Stand (healing) twice per spar.
@@ -108,7 +111,11 @@ const Battle = (() => {
     if (m.kind === "hit") {
       Ember.play("attack"); Sound.play(m.power >= 12 ? "flare" : "spark"); Fx.shoot("ember", S.colors);
       await wait(420);
-      if (!lands) { Fx.pop("dew", "MISS", "miss"); Sound.play("miss"); log(`${m.name} missed! Dewsnoot blinks, unimpressed.`); }
+      if (!lands) {
+        Fx.pop("dew", "MISS", "miss"); Sound.play("miss");
+        // Kindle is saved until a hit actually lands, so a miss doesn't waste it.
+        log(`${m.name} missed! Dewsnoot blinks, unimpressed.${game.charged ? " Your Kindle is still burning." : ""}`);
+      }
       else {
         let power = m.power * (game.charged ? 2 : 1);
         let extra = game.charged ? " Kindled: double power!" : "";
@@ -117,15 +124,16 @@ const Battle = (() => {
         game.dew.puff -= power;
         Dew.hurt(); Sound.play("hit"); Fx.pop("dew", `−${power}`, "dmg");
         log(`${m.name} hits for ${power}.${extra}`);
+        game.charged = false; Ember.setCharged(false);     // Kindle used up: it landed
       }
-      game.charged = false; Ember.setCharged(false);
     } else if (m.kind === "dodge") {
       Ember.play("dodge"); Sound.play("smoke");
       if (lands) { game.dodging = true; Fx.pop("ember", "HIDDEN", "info"); log(`${m.name}! ${S.name} is hard to see. Dewsnoot will probably miss.`); }
       else { Fx.pop("ember", "FIZZLE", "miss"); log(`${m.name} fizzled. Nothing but a cough.`); }
     } else if (m.kind === "charge") {
       Ember.play("charge"); Sound.play("charge");
-      if (lands) { game.charged = true; Ember.setCharged(true); Fx.pop("ember", "×2 NEXT HIT", "info"); log(`${m.name}! The flames burn hotter. Your next hit does double.`); }
+      if (game.charged) { Fx.pop("ember", "ALREADY ×2", "info"); log(`${S.name} is already kindled. The flames can't burn any hotter. Time to hit!`); }
+      else if (lands) { game.charged = true; Ember.setCharged(true); Fx.pop("ember", "×2 NEXT HIT", "info"); log(`${m.name}! The flames burn hotter. Your next hit does double.`); }
       else { Fx.pop("ember", "FIZZLE", "miss"); log(`${m.name} sputtered out.`); }
     }
     bars();

@@ -42,6 +42,8 @@ const Dew = (() => {
     const a = ROWS[name] || ROWS.idle;
     const loop = opts.loop ?? (name === "idle" || name === "walkLeft");
     clearTimeout(timer);
+    // "Reduce motion" setting on: resting loops show one still pose instead.
+    if (reduced && loop) { showFrame(a.row, 0); return; }
     let f = 0;
     const step = () => {
       showFrame(a.row, f);
