@@ -28,7 +28,8 @@ The live game updates a minute or two later.
 | `1595784` | Fixes from Codex's first review (Kindle, flame halos, wording, Reduce Motion) |
 | `dca3db2` | Round 5: Explorer and Builder quests, lore, your own quests, practice files |
 | `4595814` | Round 5 follow-ups: result banner, Kindle and Quest 9 wording, Notebook intro, this notes file |
-| *next* | Round 6: cleaner screen layout. Slim top bar, ☰ menu, one quest at a time under the game, ✏️ rename preview, green bar only after a change, ❓ How to play pop-up (first visit, after updates, ☰ menu, Tier 2/3 intros). Round 7: fight rework (see below) |
+| `c4ff1a6` | Round 6: cleaner screen layout. Slim top bar, ☰ menu, one quest at a time under the game, ✏️ rename preview, green bar only after a change, ❓ How to play pop-up (first visit, after updates, ☰ menu, Tier 2/3 intros). Round 7: fight rework (see below) |
+| *next* | Online code editor: ✏️ Edit code in the online game, Save & run in the browser, Reset to original, quest buttons that open the right file, "Skip for now" for computer-only quests |
 
 ## Reviews and what happened to them
 
@@ -62,6 +63,12 @@ The live game updates a minute or two later.
 - **Simulated results at Level 8 (Normal):** mashing one button wins about 60%; reading the bubble wins about 98%; random clicking about 23%. On Fierce, reading the bubble wins about 89% and mashing about 15%. The simulation is in Claude's test scripts, not in your folder.
 - **Already fine, checked:** clear goal on screen, no grinding, saves by itself, no long unskippable text, sound toggle, Reduce Motion, works on a phone, never more than two misses in a row. The learning is the game itself: changing code changes your pet, so it isn't "chocolate-covered broccoli" (a quiz with a game painted on top).
 - **First-time play-through after Round 7:** nothing big. Small fixes: Dewsnoot's Level 0 label now says "warming up" (it said "gentle", which looked like the Gentle setting), the "has your scent" and shield tags clear when a spar ends, and his puff bar drops right when you counter.
+- **Playing online, with nothing to download:** the online version has its own ✏️ code editor (`game-parts/editor.js`).
+  - The ✏️ next to the pet's name opens `my-embersnoot.js` right in the game. Practice files, lore and quests can be picked from the same editor.
+  - Save & run keeps the changes in that browser only, and the game runs them instead of the originals. The same green and red bar checks apply, with line numbers. Curly quotes from phone keyboards are straightened automatically, with a note saying so.
+  - Reset to original brings a file back.
+  - Each quest card online says where to do it and has a button that opens the right file. Quests that need the Claude app on a computer (Git, diffs, Console, subagent, terminal) have "Skip for now".
+  - On your Mac nothing changes: you still use VS Code, and the ✏️ is still the name preview.
 - **Skipped on purpose:** achievements and badges for everything (rewards that aren't tied to learning tend to replace the fun), and a fast-forward button (a spar takes about half a minute).
 
 ## Open: watch while playing

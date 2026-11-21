@@ -76,7 +76,7 @@ const Battle = (() => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       const t = e.target;
       if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
-      if (["modal", "notebook", "more"].some(id => $(id) && !$(id).hidden)) return;
+      if (["modal", "notebook", "more", "editor"].some(id => $(id) && !$(id).hidden)) return;
       const n = parseInt(e.key, 10);
       if (n >= 1 && n <= S.moves.length) { const b = document.querySelector(`.move-btn[data-i="${n - 1}"]`); if (b && !b.disabled) { e.preventDefault(); playerMove(n - 1); } }
     });

@@ -11,7 +11,8 @@
   <script>
     window.SNOOT_ERRORS = [];
     window.addEventListener("error", function (e) {
-      var m = String(e.filename || "").match(/(my-[a-z-]+\.js|practice\/[a-z-]+\.js)$/);
+      var edited = (window.SNOOT_EDITED || {})[e.filename];          // a file you changed in the online editor
+      var m = edited ? [0, edited] : String(e.filename || "").match(/(my-[a-z-]+\.js|practice\/[a-z-]+\.js)$/);
       if (m) window.SNOOT_ERRORS.push({ file: m[1], line: e.lineno, message: e.message });
     });
   </script>
@@ -110,8 +111,9 @@
     <div class="menu-block">
       <p class="eyebrow">YOUR FILES</p>
       <p id="menu-status">✓ Your files look good.</p>
-      <p class="small">🔥 Your pet lives in <code>my-embersnoot.js</code>. Change it any time: save ⌘S, then reload ⌘R.</p>
-      <p class="small preview-note" id="preview-banner" hidden>You're viewing the online version, which can't see your files. To change your pet, edit your own copy of the folder and open its <b>index.html</b>.</p>
+      <p class="small">🔥 Your pet lives in <code>my-embersnoot.js</code>. <span class="local-only">Change it any time: save ⌘S, then reload ⌘R.</span></p>
+      <p id="menu-edit" hidden><button type="button" class="chip" id="menu-edit-btn">✏️ Edit code</button> <span class="small">change your pet right here</span></p>
+      <p class="small preview-note" id="preview-banner" hidden>🌐 You're playing online. Your code changes are kept in this browser only.</p>
     </div>
     <div class="menu-block">
       <p class="eyebrow">SPARRING</p>
@@ -160,6 +162,27 @@
   </aside>
 
   <!-- POP-UP: "How to play" and short intros. Closes with ✕, Esc, or a click outside. -->
+  <!-- ✏️ CODE EDITOR: online only. Change your files right in the game. -->
+  <aside class="editor" id="editor" hidden aria-labelledby="ed-title">
+    <div class="nb-head">
+      <div><p class="eyebrow">YOUR CODE</p><h2 id="ed-title">✏️ Edit code</h2></div>
+      <button type="button" class="chip" id="ed-close">Close</button>
+    </div>
+    <label class="small" for="ed-file">File</label>
+    <select id="ed-file" class="ed-file"></select>
+    <div class="ed-box">
+      <pre class="ed-gutter" id="ed-gutter" aria-hidden="true"></pre>
+      <textarea id="ed-text" class="ed-text" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" aria-label="Code"></textarea>
+    </div>
+    <p class="small" id="ed-status"></p>
+    <div class="ed-actions">
+      <button type="button" class="primary" id="ed-save">Save &amp; run</button>
+      <button type="button" class="chip" id="ed-undo">Undo my typing</button>
+      <button type="button" class="chip" id="ed-reset" hidden>Reset to original</button>
+    </div>
+    <p class="small">Change a word or number, then <b>Save &amp; run</b>. A <b>green</b> bar means it worked; a <b>red</b> one says which line to fix. Your version stays in this browser only.</p>
+  </aside>
+
   <div class="modal-backdrop" id="modal" hidden>
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <button type="button" class="modal-x" id="modal-x" aria-label="Close">✕</button>
@@ -170,17 +193,30 @@
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
   <!-- The order matters: your pet's settings load first, then the game parts that use them. -->
-  <script src="my-embersnoot.js"></script>
-  <script src="my-lore.js"></script>
-  <script src="my-quests.js"></script>
-  <script src="practice/bug-hunt.js"></script>
-  <script src="practice/my-functions.js"></script>
+  <!-- YOUR files. On your computer, the game reads them straight from the folder.
+       Online, if you changed one in the game's ✏️ code editor, your version
+       (kept in this browser) runs instead of the original. -->
+  <script>
+    (function () {
+      var files = ["my-embersnoot.js", "my-lore.js", "my-quests.js", "practice/bug-hunt.js", "practice/my-functions.js"];
+      var online = location.protocol !== "file:";
+      window.SNOOT_EDITED = {};
+      files.forEach(function (f) {
+        var code = null;
+        if (online) { try { code = localStorage.getItem("snoot-code:" + f); } catch (e) {} }
+        var src = f;
+        if (code != null) { src = URL.createObjectURL(new Blob([code], { type: "text/javascript" })); window.SNOOT_EDITED[src] = f; }
+        document.write('<script src="' + src + '"><\/script>');
+      });
+    })();
+  </script>
   <script src="game-parts/checker.js"></script>
   <script src="game-parts/sounds.js"></script>
   <script src="game-parts/notebook.js"></script>
   <script src="game-parts/embersnoot.js"></script>
   <script src="game-parts/dewsnoot.js"></script>
   <script src="game-parts/battle.js"></script>
+  <script src="game-parts/editor.js"></script>
   <script src="game-parts/lessons.js"></script>
 </body>
 </html>

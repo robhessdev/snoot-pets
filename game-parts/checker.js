@@ -21,6 +21,9 @@ const DEFAULT_EMBERSNOOT = {
 };
 
 const Checker = (() => {
+  const ONLINE = location.protocol !== "file:";
+  // Where to fix things: VS Code on your computer, the ✏️ editor online.
+  const WHERE_FIX = ONLINE ? " In ✏️ Edit code, line numbers are on the left." : " VS Code also puts a red squiggly line under the exact spot.";
   const HEX = /^#[0-9a-fA-F]{6}$/;
   const KINDS = ["hit", "dodge", "charge"];
 
@@ -28,13 +31,13 @@ const Checker = (() => {
   function explainBrowserError(message) {
     const m = String(message || "");
     if (/[“”‘’]|invalid character|invalid or unexpected token|unterminated/i.test(m))
-      return 'Probably a curly quote (“ ” or ‘ ’) or a quote that was never closed. Code only understands straight quotes: "like this". Delete the quote and type it again in VS Code.';
+      return 'Probably a curly quote (“ ” or ‘ ’) or a quote that was never closed. Code only understands straight quotes: "like this". Delete the quote and type it again' + (ONLINE ? "." : " in VS Code.");
     if (/is not defined|can.t find variable/i.test(m))
       return 'A word is missing its quotes. Words need straight quotes around them, like  name: "Blaze",';
     if (/unexpected identifier|unexpected string|unexpected number|expected '?[,}\]]/i.test(m))
       return "Probably a missing comma. Check the end of this line and the line above: each item ends with a comma ,";
     if (/end of input|unexpected eof|end of script/i.test(m))
-      return "A bracket was deleted. Every { needs a matching } and every [ needs a matching ]. Ctrl+Z (⌘Z) in VS Code can undo.";
+      return "A bracket was deleted. Every { needs a matching } and every [ needs a matching ]. " + (ONLINE ? "Reset to original in ✏️ Edit code brings back the starting file." : "Ctrl+Z (⌘Z) in VS Code can undo.");
     if (/unexpected token/i.test(m))
       return "Something extra or missing near here, usually a comma, bracket or quote.";
     return "The browser couldn't read the file. The usual causes are a curly quote, a missing comma, or a deleted bracket.";
@@ -52,8 +55,7 @@ const Checker = (() => {
       const where = err && err.line ? `Line ${err.line} of my-embersnoot.js` : "my-embersnoot.js";
       problems.push({
         where,
-        msg: explainBrowserError(err && err.message) +
-             " VS Code also puts a red squiggly line under the exact spot.",
+        msg: explainBrowserError(err && err.message) + WHERE_FIX,
       });
       return { settings: structuredClone(DEFAULT_EMBERSNOOT), problems, fileBroken: true };
     }
@@ -157,7 +159,7 @@ const Checker = (() => {
   function unreadable(file, problems) {
     const e = fileError(file);
     problems.push({ file, where: e && e.line ? `Line ${e.line} of ${file}` : file,
-      msg: explainBrowserError(e && e.message) + " VS Code also puts a red squiggly line under the exact spot." });
+      msg: explainBrowserError(e && e.message) + WHERE_FIX });
   }
 
   function checkExtras() {

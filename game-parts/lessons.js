@@ -21,6 +21,29 @@ const Lessons = (() => {
 
   const fileOK = () => !result.fileBroken;
 
+  // ---- Playing ONLINE: where each quest happens ----
+  // Online there are no files on your computer to open, so the game has its own
+  // ✏️ code editor. Quests that need the Claude app on a computer can be skipped.
+  const PET = "my-embersnoot.js";
+  const editHere = what => `Online, you change ${what} right here: click the button, make the change, then press <b>Save &amp; run</b>.`;
+  const computerOnly = "This quest happens on a computer with the Claude app. Read it to see what's possible, then skip ahead.";
+  const ONLINE = {
+    vscode:    { note: "Online you don't need VS Code: the game has its own code editor. Click ✏️ next to your pet's name any time.", skip: "Use the game's editor →" },
+    rename:    { note: editHere(`<code>${PET}</code>`), file: PET, find: 'name: "' },
+    color:     { note: editHere(`<code>${PET}</code>`), file: PET, find: "flame:" },
+    power:     { note: editHere(`<code>${PET}</code>`), file: PET, find: "power: 8" },
+    newmove:   { note: editHere(`<code>${PET}</code>`), file: PET, find: '{ name: "Spark Flick"' },
+    claude:    { note: "The Claude step needs the Claude app on a computer. Online, finish it yourself: change <code>victoryLine</code> to something your pet would brag.", file: PET, find: "victoryLine:" },
+    git:       { note: computerOnly, skip: "Skip for now →" },
+    changes:   { note: computerOnly, skip: "Skip for now →" },
+    peek:      { note: "The Console is on computers (Chrome or Safari). On a phone, skip ahead.", skip: "Skip for now →" },
+    bughunt:   { note: editHere("<code>bug-hunt.js</code>"), file: "practice/bug-hunt.js" },
+    functions: { note: editHere("<code>my-functions.js</code>"), file: "practice/my-functions.js" },
+    subagent:  { note: computerOnly, skip: "Skip for now →" },
+    terminal:  { note: computerOnly, skip: "Skip for now →" },
+    myquest:   { note: editHere("<code>my-quests.js</code>"), file: "my-quests.js" },
+  };
+
   // ---- THE QUESTS ----
   // Each quest: a title, WHY it matters, the steps, and a check that
   // looks at your settings to see if you've done it.
@@ -401,7 +424,8 @@ const Lessons = (() => {
       const more = result.problems.length > 4 ? `<li>…and ${result.problems.length - 4} more. Fix these first.</li>` : "";
       const files = [...new Set(result.problems.map(p => p.file || "my-embersnoot.js"))];
       bar.innerHTML = `<p class="checker-title">✗ Something in ${files.join(" and ")} needs a fix</p><ul>${items}${more}</ul>
-        <p class="checker-foot">${result.fileBroken ? "The game is using the original Embersnoot until the file can be read." : "The game used safe values where it could, so it still works."} Fix it, save (⌘S), reload (⌘R). Or ask Claude: <i>“Fix ${files[0]} and explain what was wrong.”</i></p>`;
+        <p class="checker-foot">${result.fileBroken ? "The game is using the original Embersnoot until the file can be read." : "The game used safe values where it could, so it still works."} ${isLocal ? `Fix it, save (⌘S), reload (⌘R). Or ask Claude: <i>“Fix ${files[0]} and explain what was wrong.”</i>` : `<button type="button" class="chip" id="checker-edit">✏️ Fix it in Edit code</button>`}</p>`;
+      if (!isLocal) $("checker-edit").addEventListener("click", () => Editor.open(files[0]));
       $("menu-status").innerHTML = `<span class="status-bad">✗ ${files.join(" and ")} needs a fix.</span> The red bar at the top says what to change.`;
       return;
     }
@@ -470,18 +494,20 @@ const Lessons = (() => {
     const n = QUESTS.indexOf(q) + 1, done = !!progress.done[q.id], isCurrent = q === current;
     const steps = q.steps.map(s => `<li>${s}</li>`).join("");
     const needsFile = !q.manual && q.id !== "win" && q.id !== "peek";
-    const previewNote = needsFile && !isLocal && !done
-      ? `<p class="preview-note">This is the online version, which can't see your files. Do this quest in your own copy of the folder: double-click <b>index.html</b> there.</p>` : "";
+    const on = !isLocal && !done ? ONLINE[q.id] : null;          // playing online: where to do this quest
+    const onlineNote = on ? `<p class="preview-note">🌐 ${on.note}${on.file ? ` <button type="button" class="chip" id="q-edit">✏️ Open ${on.file.split("/").pop()}</button>` : ""}</p>` : "";
     let status;
     if (done) status = `<p class="q-status done-note">✓ Done.${hasCard(q.id) ? ' <button type="button" class="chip" id="q-card-open">📓 Read its Notebook card</button>' : ""}</p>`;
+    else if (on && on.skip) status = `<button type="button" class="primary" id="manual-done">${on.skip}</button>`;
     else if (q.manual) status = `<button type="button" class="primary" id="manual-done">I did it ✓</button>`;
-    else status = `<p class="q-status">Waiting for you… ${needsFile ? "This checks itself when you reload (⌘R)." : ""}</p>`;
+    else status = `<p class="q-status">Waiting for you… ${needsFile && isLocal ? "This checks itself when you reload (⌘R)." : ""}</p>`;
     const back = !isCurrent && current ? `<button type="button" class="chip back-current" id="back-current">← Back to your current quest (${QUESTS.indexOf(current) + 1})</button>` : "";
     card.innerHTML = `${back}<p class="eyebrow">QUEST ${n} OF ${QUESTS.length} · ${TIERS[tierOf(q)].toUpperCase()}${done ? " · DONE" : isCurrent ? "" : " · COMING UP"}</p>
-      <h3>${q.title}</h3><p class="why"><b>Why:</b> ${q.why}</p><ol class="steps">${steps}</ol>${q.extra && !done ? q.extra() : ""}${previewNote}${status}`;
+      <h3>${q.title}</h3><p class="why"><b>Why:</b> ${q.why}</p>${onlineNote}<ol class="steps">${steps}</ol>${q.extra && !done ? q.extra() : ""}${status}`;
     if (back) $("back-current").addEventListener("click", () => { viewing = null; renderQuests(); });
     if (done && hasCard(q.id)) $("q-card-open").addEventListener("click", () => openNotebookAt(q.id));
-    if (!done && q.manual) $("manual-done").addEventListener("click", () => {
+    if (on && on.file) $("q-edit").addEventListener("click", () => Editor.open(on.file, on.find));
+    if (!done && (q.manual || (on && on.skip))) $("manual-done").addEventListener("click", () => {
       progress.done[q.id] = true; save(); viewing = null; celebrate([q]); renderQuests();
     });
   }
@@ -509,6 +535,12 @@ const Lessons = (() => {
       document.querySelectorAll(".pet-name").forEach(el => el.textContent = shown);
       $("rename-line").textContent = `name: ${JSON.stringify(shown)},`;
     };
+    // Online: ✏️ opens the code editor at your pet's name. On your computer: a name preview.
+    if (!isLocal) {
+      $("rename-open").title = "Edit your pet's code"; $("rename-open").setAttribute("aria-label", "Edit your pet's code");
+      $("rename-open").addEventListener("click", () => Editor.open("my-embersnoot.js", 'name: "'));
+      return;
+    }
     $("rename-open").addEventListener("click", () => {
       pop.hidden = !pop.hidden;
       if (!pop.hidden) { input.value = S.name; show(S.name); input.focus(); input.select(); }
@@ -590,6 +622,7 @@ const Lessons = (() => {
   const fingerprint = () => JSON.stringify({ S, lore: extras.lore, quests: myQuests().map(q => q.title + String(q.check)), practice: practiceSource() });
   let remindedFor = null;           // don't nag twice in one visit
   function maybeRemindSave() {
+    if (!isLocal) return;                                       // save points are for your own copy
     if (result.fileBroken || result.problems.length) return;    // fix the red bar first
     const fp = fingerprint();
     if (fp === progress.savedPrint || fp === remindedFor) return;
@@ -688,7 +721,9 @@ const Lessons = (() => {
         <div><p class="ht-icon">🔥</p><p><b>Your pet</b><br>${name} is yours, on the right. Dewsnoot, on the left, is the friendly opponent who guards his garden.</p></div>
         <div><p class="ht-icon">⚔️</p><p><b>Spar</b><br>The bubble over Dewsnoot shows his <b>next move</b>. Answer it: <b>Smoke Puff</b> dodges a 💧 splash, <b>Kindle</b> before a 🌿 shield so your doubled hit burns through, hit hard when he 💪 heals. Keys <b>1</b>–<b>4</b> work too. Whoever runs out of puff sits down.</p></div>
         <div><p class="ht-icon">⭐</p><p><b>Quests and levels</b><br>Quests under the game teach you code, one small step at a time. Each one levels up ${name}: more puff, more power every 4 levels, a Notebook card and lore. Dewsnoot trains too, up to Level 8.</p></div>
-        <div><p class="ht-icon">✏️</p><p><b>Make it yours</b><br>Your pet's settings live in <code>my-embersnoot.js</code>. Change it, save (⌘S), reload (⌘R). A <b>green</b> bar means it worked; a <b>red</b> one says how to fix it.</p></div>
+        ${isLocal
+          ? `<div><p class="ht-icon">✏️</p><p><b>Make it yours</b><br>Your pet's settings live in <code>my-embersnoot.js</code>. Change it, save (⌘S), reload (⌘R). A <b>green</b> bar means it worked; a <b>red</b> one says how to fix it.</p></div>`
+          : `<div><p class="ht-icon">✏️</p><p><b>Make it yours</b><br>Click <b>✏️</b> next to your pet's name to open its code right here. Change a word or number, press <b>Save &amp; run</b>. A <b>green</b> bar means it worked; a <b>red</b> one says which line to fix.</p></div>`}
         <div><p class="ht-icon">📓</p><p><b>Notebook</b><br>Everything you learn, one card at a time, with a quick question at the end of each chapter.</p></div>
         <div><p class="ht-icon">☰</p><p><b>Menu</b><br>Gentle, Normal or Fierce, your win record, this guide again, code peeks and your file status.</p></div>
       </div>
@@ -748,7 +783,12 @@ const Lessons = (() => {
     if (progress.printVersion !== 2 && !result.problems.length) { progress.savedPrint = fingerprint(); progress.printVersion = 2; save(); }
     if (!progress.lastLoaded && !result.problems.length) progress.lastLoaded = fingerprint();   // first visit: nothing has "changed" yet
     renderChecker();
-    if (!isLocal) $("preview-banner").hidden = false;
+    if (!isLocal) {
+      $("preview-banner").hidden = false; $("menu-edit").hidden = false;
+      document.querySelectorAll(".local-only").forEach(el => el.hidden = true);
+      $("menu-edit-btn").addEventListener("click", () => { $("more").hidden = true; Editor.open(); });
+      if (Editor.takeNote()) setTimeout(() => toast("Your keyboard typed curly quotes “ ”. Code only reads straight ones \" \", so the editor straightened them for you."), 800);
+    }
     document.querySelectorAll(".pet-name").forEach(el => el.textContent = S.name);
     // Your badge: "ROBIN · TEAM FLAME 🔥", or "YOU · TEAM FLAME 🔥" with no name.
     $("badge-you").textContent = `${(S.trainerName || "You").toUpperCase()} · ${S.teamName.toUpperCase()} 🔥`;

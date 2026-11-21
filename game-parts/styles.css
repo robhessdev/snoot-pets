@@ -377,3 +377,17 @@ kbd { font: 700 .75rem ui-monospace, monospace; border: 1px solid var(--line); b
 @media (prefers-reduced-motion: reduce) {
   .arena.shake-small, .arena.shake-big { animation: none; }
 }
+.modal a, .preview-note a { color: var(--ember); font-weight: 700; }
+
+/* ---- ✏️ Code editor (online version only) ---- */
+.editor { position: fixed; top: 0; right: 0; bottom: 0; width: min(620px, 100%); background: var(--paper); border-left: 1px solid var(--line); box-shadow: -14px 0 40px rgba(40, 25, 15, .2); overflow-y: auto; padding: 20px 20px 32px; z-index: 22; display: flex; flex-direction: column; gap: 8px; }
+.editor h2 { margin: 0; font: 500 1.6rem Georgia, serif; }
+.ed-file { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+.ed-box { display: flex; flex: 1; min-height: 300px; border: 1px solid #3b3130; border-radius: 12px; overflow: hidden; background: #2b2322; }
+.ed-gutter, .ed-text { font: 13px/1.55 ui-monospace, Menlo, monospace; margin: 0; padding: 12px 8px; }
+.ed-gutter { color: #8d7c76; text-align: right; user-select: none; overflow: hidden; min-width: 2.6em; background: #241d1c; border-right: 1px solid #3b3130; }
+.ed-text { flex: 1; resize: none; border: 0; outline: none; background: transparent; color: #f6ece4; white-space: pre; overflow: auto; tab-size: 2; caret-color: var(--ember); }
+.ed-text::selection { background: rgba(255, 138, 36, .45); }
+.ed-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+#ed-status { margin: 0; }
+@media (max-width: 700px) { .editor { padding: 14px 12px 24px; } .ed-gutter, .ed-text { font-size: 12px; } }
