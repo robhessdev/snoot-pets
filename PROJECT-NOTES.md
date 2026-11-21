@@ -27,7 +27,8 @@ The live game updates a minute or two later.
 | `7a3603a` | Codex's painted Embersnoot |
 | `1595784` | Fixes from Codex's first review (Kindle, flame halos, wording, Reduce Motion) |
 | `dca3db2` | Round 5: Explorer and Builder quests, lore, your own quests, practice files |
-| *next* | Round 5 follow-ups: result banner clears on a new spar, Kindle and Quest 9 wording, Notebook intro, this notes file |
+| `4595814` | Round 5 follow-ups: result banner, Kindle and Quest 9 wording, Notebook intro, this notes file |
+| *next* | Round 6: cleaner screen layout. Slim top bar, ☰ menu, one quest at a time under the game, ✏️ rename preview, green bar only after a change, ❓ How to play pop-up (first visit, after updates, ☰ menu, Tier 2/3 intros). Round 7: fight rework (see below) |
 
 ## Reviews and what happened to them
 
@@ -43,9 +44,30 @@ The live game updates a minute or two later.
   - Quest 9 "links to a private page": the repository is public; the wording is now general anyway.
   - Codex didn't repeat Claude's file-breaking tests (Claude runs those every round).
 
+## Design decisions
+
+- **Renaming in the game is a preview.** Web pages aren't allowed to write files on your computer (a browser safety rule), so the ✏️ button shows the new name and gives you the exact line to paste into `my-embersnoot.js`.
+- **The screen puts the game first.** Notes and extras live in the ☰ menu; quests sit under the arena, one at a time.
+- **Round 7: the fight was checked against other games** (pet battlers, virtual pets, learn-to-code games) and common bad-game mistakes. A simulation of thousands of spars found:
+  - Pressing Flare Stamp every turn was the best plan. One button beats thinking, so the choices didn't matter.
+  - Kindle was a trap: a smart Dewsnoot always splashed it out.
+  - Levelling up only made Dewsnoot tougher, so progress felt like punishment. At Level 6–8, almost every spar was lost.
+- **What changed (all in `game-parts/battle.js`):**
+  - Dewsnoot's bubble shows his next move and never lies.
+  - Each of your moves answers one of his: Smoke Puff dodges a splash (90%) and counters for 6. A kindled hit burns through Fern Shield. Hit hard while he heals. After a sniff, his next splash can't be dodged.
+  - Your pet grows: 40 puff, +2 a level up to Level 10, and +1 power on hits every 4 levels.
+  - Gentle, Normal and Fierce in the ☰ menu. Fierce hides the hints.
+  - A loss shows a tip based on that spar. After 3 losses in a row, it suggests Gentle.
+  - Win record and streaks in the menu. Keys 1–4 pick moves. A small shake on hits, off for Reduce Motion.
+- **Simulated results at Level 8 (Normal):** mashing one button wins about 60%; reading the bubble wins about 98%; random clicking about 23%. On Fierce, reading the bubble wins about 89% and mashing about 15%. The simulation is in Claude's test scripts, not in your folder.
+- **Already fine, checked:** clear goal on screen, no grinding, saves by itself, no long unskippable text, sound toggle, Reduce Motion, works on a phone, never more than two misses in a row. The learning is the game itself: changing code changes your pet, so it isn't "chocolate-covered broccoli" (a quiz with a game painted on top).
+- **First-time play-through after Round 7:** nothing big. Small fixes: Dewsnoot's Level 0 label now says "warming up" (it said "gentle", which looked like the Gentle setting), the "has your scent" and shield tags clear when a spar ends, and his puff bar drops right when you counter.
+- **Skipped on purpose:** achievements and badges for everything (rewards that aren't tied to learning tend to replace the fun), and a fast-forward button (a spar takes about half a minute).
+
 ## Open: watch while playing
 
-- **Difficulty around Levels 1–3:** is Dewsnoot too tough too soon? Change only if it keeps feeling unfair.
+- **Difficulty after the Round 7 rework:** does Normal feel fair? Is Fierce a good test? Numbers are easy to tune in `battle.js` (look for `DIFFICULTY`).
+- **The bubble's hints:** helpful, or too much hand-holding once you know the moves?
 
 ## Next up for Robin
 
@@ -59,3 +81,5 @@ The live game updates a minute or two later.
 - **Skins** that unlock as you level up. Same sprite format as Embersnoot: see `for-codex/CODEX-BRIEF.md`, section 8.
 - **A real desktop pet:** Embersnoot living on your Mac screen.
 - A leaderboard: decided it isn't needed.
+- **More opponents** with their own moves and bubbles (each would need art, like Dewsnoot).
+- **Spar speed setting,** if spars ever feel slow.

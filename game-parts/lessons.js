@@ -29,8 +29,8 @@ const Lessons = (() => {
       id: "win", title: "Win your first spar",
       why: "Play first, so you know what you're about to change.",
       steps: [
-        "Pick a move under the arena. Watch what it does.",
-        "Try <b>Kindle</b>, then a hit. Kindle doubles your next hit that lands, unless Dewsnoot's dew puts it out first.",
+        "Look at the bubble over Dewsnoot: it shows his <b>next move</b>. Then pick one of yours under the arena.",
+        "When he's about to 💧 splash, try <b>Smoke Puff</b>. When he's about to 🌿 shield or 👃 sniff, try <b>Kindle</b>, then a hit. Kindle doubles your next hit that lands, unless a splash puts it out first.",
         "Keep going until Dewsnoot sits down, out of puff.",
       ],
       check: () => progress.wins >= 1,
@@ -52,7 +52,7 @@ const Lessons = (() => {
       why: "Words inside quotes are called a <b>string</b>. The game shows them, but doesn't try to run them as code.",
       steps: [
         'In <b>my-embersnoot.js</b>, find the line <code>name: "Embersnoot",</code>',
-        "Change the word between the quotes to any name you like. Keep both quotes and the comma.",
+        "Change the word between the quotes to any name you like. Keep both quotes and the comma. <i>Shortcut: click ✏️ next to your pet's name in the arena to try names and copy the exact line.</i>",
         'Bonus: a few lines down, put <b>your</b> name in <code>trainerName: "",</code> (between the quotes). You can rename <code>teamName</code> too. Watch your badge in the arena change.',
         "Save: <b>⌘S</b>. Then come back here and reload: <b>⌘R</b>.",
       ],
@@ -201,7 +201,7 @@ const Lessons = (() => {
     7: "One Starter quest left: save points with Git.",
     8: "🧭 Tier 2, Explorer, is open: time to look inside the game.",
     12: "🛠️ Tier 3, Builder, is open: time to work with AI agents.",
-    15: "Every quest done! Free play is open. The ideas are in the quest panel.",
+    15: "Every quest done! Free play is open. The ideas are in the quest panel. Want a real test? ☰ Menu → Fierce.",
   };
 
   // ---- Practice boards: the game runs your functions and checks the answers ----
@@ -245,11 +245,14 @@ const Lessons = (() => {
     let msg = `✓ Quest complete: ${newly.map(q => q.title).join(", ")}. ${S.name} is now Level ${lv}.`;
     msg += " 📓 New Notebook card unlocked.";
     if (UNLOCKS[lv]) msg += " " + UNLOCKS[lv];
-    else if (lv <= 8) msg += " Dewsnoot will be a little tougher next spar.";
+    if (lv <= 10) msg += ` ${S.name} grows: ${Battle.emberMax(lv)} puff${lv % 4 === 0 ? `, and +${Battle.powerBonus(lv)} power on every hit` : ""}.`;
+    if (lv <= 8) msg += " Dewsnoot trains a little harder too.";
     const lore = extras.lore.filter(l => l.unlockAt === lv);
     if (lore.length) msg += ` 📜 New lore: ${lore.map(l => l.title).join(", ")}.`;
     toast(msg);
     Ember.setLevel(lv);
+    const tier = lv === 8 ? 2 : lv === 12 ? 3 : 0;
+    if (tier && !(progress.intros && progress.intros[tier])) setTimeout(() => tierIntro(tier), 900);
     renderNotebook();
     setTimeout(maybeRemindSave, 400);
   }
@@ -387,70 +390,141 @@ const Lessons = (() => {
   }
 
   // ---- The green/red bar at the top ----
+  // RED: shows whenever something in your files needs fixing.
+  // GREEN: shows only right after you changed a file, to say "your change worked".
+  // Otherwise it stays out of the way, and the ☰ menu shows your files' status.
   function renderChecker() {
     const bar = $("checker");
     if (result.problems.length) {
-      bar.className = "checker bad";
+      bar.className = "checker bad"; bar.hidden = false;
       const items = result.problems.slice(0, 4).map(p => p.msg.startsWith(p.where) ? `<li>${esc(p.msg)}</li>` : `<li><b>${esc(p.where)}:</b> ${esc(p.msg)}</li>`).join("");
       const more = result.problems.length > 4 ? `<li>…and ${result.problems.length - 4} more. Fix these first.</li>` : "";
       const files = [...new Set(result.problems.map(p => p.file || "my-embersnoot.js"))];
       bar.innerHTML = `<p class="checker-title">✗ Something in ${files.join(" and ")} needs a fix</p><ul>${items}${more}</ul>
         <p class="checker-foot">${result.fileBroken ? "The game is using the original Embersnoot until the file can be read." : "The game used safe values where it could, so it still works."} Fix it, save (⌘S), reload (⌘R). Or ask Claude: <i>“Fix ${files[0]} and explain what was wrong.”</i></p>`;
-    } else {
-      bar.className = "checker good";
-      const changed = S.name !== D.name ? ` Meet ${esc(S.name)}.` : "";
-      bar.innerHTML = `<p class="checker-title">✓ my-embersnoot.js looks great.${changed}</p>`;
+      $("menu-status").innerHTML = `<span class="status-bad">✗ ${files.join(" and ")} needs a fix.</span> The red bar at the top says what to change.`;
+      return;
     }
+    $("menu-status").innerHTML = '<span class="status-good">✓ Your files look good.</span>';
+    const fp = fingerprint();
+    if (progress.lastLoaded && progress.lastLoaded !== fp) {
+      bar.className = "checker good"; bar.hidden = false;
+      bar.innerHTML = `<p class="checker-title">✓ Your change worked. ${esc(S.name)} is ready.</p><button type="button" class="chip" id="checker-ok">OK</button>`;
+      $("checker-ok").addEventListener("click", () => bar.hidden = true);
+    } else bar.hidden = true;
+    progress.lastLoaded = fp; save();
   }
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
-  // ---- Quest panel ----
+  // ---- Quest bar: one quest at a time, a row of progress dots, and the full list on request ----
+  let viewing = null;               // a quest you clicked in the dots/list (null = your current quest)
   function renderQuests() {
     const lv = level();
     $("level").textContent = `Level ${lv}`;
-    const list = $("quest-list"); list.innerHTML = "";
     const current = QUESTS.find(q => !progress.done[q.id]);
+    if (viewing && viewing === current) viewing = null;
+
+    // progress dots, grouped by tier
+    const dots = $("quest-dots"); dots.innerHTML = "";
+    QUESTS.forEach((q, i) => {
+      if (i > 0 && tierOf(q) !== tierOf(QUESTS[i - 1])) { const gap = document.createElement("span"); gap.className = "qd-gap"; dots.append(gap); }
+      const d = document.createElement("button"); d.type = "button";
+      const done = !!progress.done[q.id];
+      d.className = "qd" + (done ? " done" : "") + (q === current ? " current" : "") + ((viewing || current) === q ? " viewing" : "");
+      d.title = `Quest ${i + 1}: ${q.title}${done ? " (done)" : ""}`;
+      d.setAttribute("aria-label", d.title);
+      d.textContent = done ? "✓" : String(i + 1);
+      d.addEventListener("click", () => { viewing = q === current ? null : q; renderQuests(); });
+      dots.append(d);
+    });
+
+    // the full list (hidden until you ask for it)
+    const list = $("quest-list"); list.innerHTML = "";
     QUESTS.forEach((q, i) => {
       if (i === 0 || tierOf(q) !== tierOf(QUESTS[i - 1])) {
         const h = document.createElement("li"); h.className = "tier-head";
         h.textContent = `Tier ${tierOf(q)}: ${TIERS[tierOf(q)]}`; list.append(h);
       }
-      const li = document.createElement("li");
-      const done = !!progress.done[q.id];
+      const li = document.createElement("li"), done = !!progress.done[q.id];
       li.className = "quest" + (done ? " done" : "") + (q === current ? " current" : "");
-      li.innerHTML = `<span class="q-mark">${done ? "✓" : i + 1}</span><span class="q-title">${q.title}</span>`;
-      // A finished quest becomes a button that opens its Notebook card.
-      if (done && hasCard(q.id)) {
-        const b = document.createElement("button"); b.type = "button";
-        b.title = "Open this quest's Notebook card";
-        b.innerHTML = li.innerHTML + '<span class="q-nb">📓</span>';
-        b.addEventListener("click", () => openNotebookAt(q.id));
-        li.innerHTML = ""; li.append(b);
-      }
-      list.append(li);
+      const b = document.createElement("button"); b.type = "button";
+      b.innerHTML = `<span class="q-mark">${done ? "✓" : i + 1}</span><span class="q-title">${q.title}</span>`;
+      b.addEventListener("click", () => { viewing = q === current ? null : q; renderQuests(); $("quest-card").scrollIntoView({ behavior: "smooth", block: "nearest" }); });
+      li.append(b); list.append(li);
     });
     renderMyQuests();
+    renderQuestCard(viewing || current, current);
+  }
+
+  function renderQuestCard(q, current) {
     const card = $("quest-card");
-    if (!current) {
+    if (!q) {
       card.innerHTML = `<p class="eyebrow">FREE PLAY</p><h3>You finished every quest.</h3>
-        <p>Embersnoot is yours to keep shaping. Some ideas, from easy to bold:</p>
+        <p>${esc(S.name)} is yours to keep shaping. Some ideas, from easy to bold:</p>
         <ul class="ideas"><li>Design more quests in <code>my-quests.js</code>, and add lore to <code>my-lore.js</code></li>
         <li>Ask your <b>snoot-reviewer</b> subagent to check each change you make</li>
         <li>Ask Claude in the Code tab: “Add a new move kind called heal that gives Embersnoot back puff. Explain each line you add.”</li>
         <li>Ask Claude: “Add a second opponent. Keep it simple and explain the plan before you change anything.”</li></ul>`;
       return;
     }
-    const steps = current.steps.map(s => `<li>${s}</li>`).join("");
-    const needsFile = !current.manual && current.id !== "win" && current.id !== "peek";
-    const previewNote = needsFile && !isLocal
+    const n = QUESTS.indexOf(q) + 1, done = !!progress.done[q.id], isCurrent = q === current;
+    const steps = q.steps.map(s => `<li>${s}</li>`).join("");
+    const needsFile = !q.manual && q.id !== "win" && q.id !== "peek";
+    const previewNote = needsFile && !isLocal && !done
       ? `<p class="preview-note">This is the online version, which can't see your files. Do this quest in your own copy of the folder: double-click <b>index.html</b> there.</p>` : "";
-    const status = current.manual
-      ? `<button type="button" class="primary" id="manual-done">I did it ✓</button>`
-      : `<p class="q-status">Waiting for you… ${needsFile ? "This checks itself when you reload (⌘R)." : ""}</p>`;
-    card.innerHTML = `<p class="eyebrow">QUEST ${QUESTS.indexOf(current) + 1} OF ${QUESTS.length} · ${TIERS[tierOf(current)].toUpperCase()}</p>
-      <h3>${current.title}</h3><p class="why"><b>Why:</b> ${current.why}</p><ol class="steps">${steps}</ol>${current.extra ? current.extra() : ""}${previewNote}${status}`;
-    if (current.manual) $("manual-done").addEventListener("click", () => {
-      progress.done[current.id] = true; save(); celebrate([current]); renderQuests();
+    let status;
+    if (done) status = `<p class="q-status done-note">✓ Done.${hasCard(q.id) ? ' <button type="button" class="chip" id="q-card-open">📓 Read its Notebook card</button>' : ""}</p>`;
+    else if (q.manual) status = `<button type="button" class="primary" id="manual-done">I did it ✓</button>`;
+    else status = `<p class="q-status">Waiting for you… ${needsFile ? "This checks itself when you reload (⌘R)." : ""}</p>`;
+    const back = !isCurrent && current ? `<button type="button" class="chip back-current" id="back-current">← Back to your current quest (${QUESTS.indexOf(current) + 1})</button>` : "";
+    card.innerHTML = `${back}<p class="eyebrow">QUEST ${n} OF ${QUESTS.length} · ${TIERS[tierOf(q)].toUpperCase()}${done ? " · DONE" : isCurrent ? "" : " · COMING UP"}</p>
+      <h3>${q.title}</h3><p class="why"><b>Why:</b> ${q.why}</p><ol class="steps">${steps}</ol>${q.extra && !done ? q.extra() : ""}${previewNote}${status}`;
+    if (back) $("back-current").addEventListener("click", () => { viewing = null; renderQuests(); });
+    if (done && hasCard(q.id)) $("q-card-open").addEventListener("click", () => openNotebookAt(q.id));
+    if (!done && q.manual) $("manual-done").addEventListener("click", () => {
+      progress.done[q.id] = true; save(); viewing = null; celebrate([q]); renderQuests();
+    });
+  }
+
+  // ---- ☰ Menu, the "All quests" list, and trying a new name ----
+  function initMenu() {
+    const open = () => { $("more").hidden = false; $("more-close").focus(); };
+    const close = () => { $("more").hidden = true; };
+    $("more-open").addEventListener("click", open);
+    $("more-close").addEventListener("click", close);
+    document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("more").hidden) close(); });
+    // a code peek opened from the menu: close the menu so you can see it
+    document.querySelectorAll("#more [data-peek]").forEach(b => b.addEventListener("click", close));
+    $("all-quests-toggle").addEventListener("click", () => {
+      const box = $("all-quests"), show = box.hidden;
+      box.hidden = !show; $("all-quests-toggle").textContent = show ? "Hide list" : "All quests";
+      $("all-quests-toggle").setAttribute("aria-expanded", String(show));
+    });
+  }
+
+  function initRename() {
+    const pop = $("rename-pop"), input = $("rename-input"), original = S.name;
+    const show = name => {
+      const shown = name.trim() || original;
+      document.querySelectorAll(".pet-name").forEach(el => el.textContent = shown);
+      $("rename-line").textContent = `name: ${JSON.stringify(shown)},`;
+    };
+    $("rename-open").addEventListener("click", () => {
+      pop.hidden = !pop.hidden;
+      if (!pop.hidden) { input.value = S.name; show(S.name); input.focus(); input.select(); }
+    });
+    input.addEventListener("input", () => show(input.value));
+    // Done: put the real name back (the preview was never saved), with a reminder how to keep it.
+    $("rename-close").addEventListener("click", () => {
+      pop.hidden = true;
+      const tried = input.value.trim();
+      document.querySelectorAll(".pet-name").forEach(el => el.textContent = S.name);
+      if (tried && tried !== S.name) toast(`To keep “${tried}”, paste the copied line into my-embersnoot.js, save (⌘S) and reload (⌘R).`);
+    });
+    $("rename-copy").addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText($("rename-line").textContent); $("rename-copy").textContent = "Copied ✓"; }
+      catch (e) { $("rename-copy").textContent = "Select the line and copy it (⌘C)"; }
+      setTimeout(() => $("rename-copy").textContent = "Copy line", 2500);
     });
   }
 
@@ -467,8 +541,46 @@ const Lessons = (() => {
     }).join("") + "</ul>";
   }
 
-  function recordWin() { progress.wins++; save(); celebrate(evaluate()); renderQuests(); maybeRemindSave(); }
-  function recordLoss() { progress.losses++; save(); maybeRemindSave(); }
+  // Wins, losses and streaks. Returns the streak so the spar can cheer about it.
+  function recordWin() {
+    progress.wins++; progress.streak = (progress.streak || 0) + 1; progress.lossRow = 0;
+    progress.best = Math.max(progress.best || 0, progress.streak);
+    progress.diffWins = Object.assign({}, progress.diffWins, { [difficulty()]: ((progress.diffWins || {})[difficulty()] || 0) + 1 });
+    save(); renderRecord(); celebrate(evaluate()); renderQuests(); maybeRemindSave();
+    return progress.streak;
+  }
+  function recordLoss() {
+    progress.losses++; progress.streak = 0; progress.lossRow = (progress.lossRow || 0) + 1;
+    save(); renderRecord(); maybeRemindSave();
+    return progress.lossRow;
+  }
+
+  // ---- ⚔️ Sparring: difficulty and your record (in the ☰ menu) ----
+  const difficulty = () => (Battle.DIFFICULTY[progress.difficulty] ? progress.difficulty : "normal");
+  const DIFF_NOTES = {
+    gentle: "Gentle: Dewsnoot has less puff and softer splashes. Good for learning the moves.",
+    normal: "Normal: the standard spar. Read the bubble and you'll win most fights.",
+    fierce: "Fierce: more puff, harder splashes, and his bubble shows no hints. A real test.",
+  };
+  function renderRecord() {
+    const w = progress.wins || 0, l = progress.losses || 0, fw = (progress.diffWins || {}).fierce || 0;
+    $("record").innerHTML = `<b>Your record:</b> ${w} win${w === 1 ? "" : "s"}, ${l} loss${l === 1 ? "" : "es"} · streak ${progress.streak || 0} · best ${progress.best || 0}${fw ? ` · 🏅 ${fw} Fierce win${fw === 1 ? "" : "s"}` : ""}`;
+    document.querySelectorAll("#diff-chips [data-diff]").forEach(b => {
+      const on = b.dataset.diff === difficulty();
+      b.classList.toggle("on", on); b.setAttribute("aria-checked", String(on));
+    });
+    $("diff-note").textContent = DIFF_NOTES[difficulty()];
+  }
+  function initDifficulty() {
+    document.querySelectorAll("#diff-chips [data-diff]").forEach(b => b.addEventListener("click", () => {
+      if (b.dataset.diff === difficulty()) return;
+      progress.difficulty = b.dataset.diff; save(); renderRecord();
+      if (Battle.isBusy()) { toast(`Dewsnoot will be ${Battle.DIFFICULTY[difficulty()].label} from the next spar.`); return; }
+      toast(`Dewsnoot is now ${Battle.DIFFICULTY[difficulty()].label}. A fresh spar has started.`);
+      Battle.start();
+    }));
+    renderRecord();
+  }
 
   // ---- 💾 Save-point reminder ----
   // A "fingerprint" is your whole pet file written out as one line of text.
@@ -506,8 +618,8 @@ const Lessons = (() => {
     const m = S.moves[i];
     const line = `{ name: "${m.name}", kind: "${m.kind}", power: ${m.power}, chance: ${m.chance}, },`;
     const rule = {
-      hit: `if (Math.random() * 100 < move.chance) {\n  dewsnoot.puff = dewsnoot.puff - move.power;\n}`,
-      dodge: `if (Math.random() * 100 < move.chance) {\n  dodging = true;   // Dewsnoot's next splash will probably miss\n}`,
+      hit: `if (Math.random() * 100 < move.chance) {\n  dewsnoot.puff = dewsnoot.puff - (move.power + levelBonus);\n}`,
+      dodge: `if (Math.random() * 100 < move.chance) {\n  dodging = true;   // his next splash will probably miss,\n}                   // and then you counter-spark`,
       charge: `if (Math.random() * 100 < move.chance) {\n  charged = true;   // the next hit's power gets doubled\n}`,
     }[m.kind];
     const notes = [
@@ -518,7 +630,8 @@ const Lessons = (() => {
       ["Math.random() * 100", "rolls a random number from 0 to 100, like dice."],
       ["if ( … ) { … }", "only runs the part inside { } when the roll is lower than the chance."],
     ];
-    if (m.kind === "hit") notes.push(["dewsnoot.puff - move.power", "the minus takes the power away from Dewsnoot's puff."]);
+    if (m.kind === "hit") notes.push(["move.power + levelBonus", `your power plus your level bonus (+${Battle.powerBonus(level())} right now: +1 every 4 levels). The brackets work it out first, like in maths.`],
+      ["dewsnoot.puff - ( … )", "the minus takes that away from Dewsnoot's puff."]);
     showPeek(`How “${m.name}” works`, `// In YOUR file, my-embersnoot.js:\n${line}\n\n// In the game rules (game-parts/battle.js), simplified:\n${rule}`, notes,
       `<b>Try it:</b> in my-embersnoot.js, change <code>chance: ${m.chance}</code> to a different number, save (⌘S), reload (⌘R), and open this panel again. Your new number will be here.`);
   }
@@ -548,20 +661,55 @@ const Lessons = (() => {
   }
 
   // ---- 🆕 What's new: shown once after each update round ----
-  const VERSION = "round-5";
+  const VERSION = "round-7";
   const WHATS_NEW = [
-    "<b>7 new quests</b> in two new tiers: <b>Explorer</b> (look inside the game) and <b>Builder</b> (work with AI agents).",
-    "New files that are yours: <code>my-lore.js</code>, <code>my-quests.js</code> and the <code>practice</code> folder.",
-    "<b>Hollowmere lore</b> is in the 📓 Notebook, and it unlocks as you level up.",
-    "The Notebook has a new chapter: <b>Working with AI</b>.",
+    "Dewsnoot now shows his <b>next move</b> in a bubble. Each of your moves answers one of his, so every turn is a real choice.",
+    "<b>Smoke Puff</b> dodges a splash and lets you counter. A <b>kindled</b> hit burns straight through Fern Shield.",
+    "Levelling up makes your pet stronger: more puff, and more power every 4 levels.",
+    "Pick <b>Gentle, Normal or Fierce</b> and see your win record in the <b>☰ menu</b>. Keys <b>1</b>–<b>4</b> pick moves.",
+    "Lose a spar and you get a tip about what to try next.",
   ];
-  function showWhatsNew() {
-    if (progress.seenVersion === VERSION) return;
-    if (!progress.seenVersion && !progress.wins && !Object.keys(progress.done).length) { progress.seenVersion = VERSION; save(); return; }   // brand-new player: nothing is "new"
-    const box = $("whats-new");
-    box.innerHTML = `<div><p><b>🆕 What's new</b></p><ul>${WHATS_NEW.map(w => `<li>${w}</li>`).join("")}</ul></div><button type="button" class="chip" id="whats-new-ok">Got it</button>`;
-    box.hidden = false;
-    $("whats-new-ok").addEventListener("click", () => { progress.seenVersion = VERSION; save(); box.hidden = true; });
+  // ---- ❓ The pop-up: "How to play", and short intros at the start of Tier 2 and Tier 3 ----
+  function openModal(html, onClose) {
+    $("modal-body").innerHTML = html; $("modal").hidden = false; $("modal-x").focus();
+    const close = () => { $("modal").hidden = true; document.removeEventListener("keydown", esc); onClose && onClose(); };
+    const esc = e => { if (e.key === "Escape") close(); };
+    document.addEventListener("keydown", esc);
+    $("modal-x").onclick = close;
+    $("modal").onclick = e => { if (e.target === $("modal")) close(); };       // click outside the box
+    $("modal-body").querySelectorAll("[data-close]").forEach(b => b.onclick = close);
+  }
+
+  function howToHTML(news) {
+    const name = esc(S.name);
+    const newBox = news ? `<div class="modal-news"><p><b>🆕 New this time</b></p><ul>${WHATS_NEW.map(w => `<li>${w}</li>`).join("")}</ul></div>` : "";
+    return `<p class="eyebrow">HOW TO PLAY</p><h2 id="modal-title">Welcome to Snoot Pets</h2>${newBox}
+      <div class="howto-grid">
+        <div><p class="ht-icon">🔥</p><p><b>Your pet</b><br>${name} is yours, on the right. Dewsnoot, on the left, is the friendly opponent who guards his garden.</p></div>
+        <div><p class="ht-icon">⚔️</p><p><b>Spar</b><br>The bubble over Dewsnoot shows his <b>next move</b>. Answer it: <b>Smoke Puff</b> dodges a 💧 splash, <b>Kindle</b> before a 🌿 shield so your doubled hit burns through, hit hard when he 💪 heals. Keys <b>1</b>–<b>4</b> work too. Whoever runs out of puff sits down.</p></div>
+        <div><p class="ht-icon">⭐</p><p><b>Quests and levels</b><br>Quests under the game teach you code, one small step at a time. Each one levels up ${name}: more puff, more power every 4 levels, a Notebook card and lore. Dewsnoot trains too, up to Level 8.</p></div>
+        <div><p class="ht-icon">✏️</p><p><b>Make it yours</b><br>Your pet's settings live in <code>my-embersnoot.js</code>. Change it, save (⌘S), reload (⌘R). A <b>green</b> bar means it worked; a <b>red</b> one says how to fix it.</p></div>
+        <div><p class="ht-icon">📓</p><p><b>Notebook</b><br>Everything you learn, one card at a time, with a quick question at the end of each chapter.</p></div>
+        <div><p class="ht-icon">☰</p><p><b>Menu</b><br>Gentle, Normal or Fierce, your win record, this guide again, code peeks and your file status.</p></div>
+      </div>
+      <button type="button" class="primary modal-go" data-close>Let's play</button>`;
+  }
+
+  const TIER_INTROS = {
+    2: { title: "Tier 2: Explorer", body: "You can change your pet. Now you'll <b>look inside things</b>: read exactly what changed, use the browser's Console, hunt down bugs, and write your first function.", tip: "These quests use the <code>practice</code> folder. A board in each quest turns green as you go." },
+    3: { title: "Tier 3: Builder", body: "Time to <b>work with AI agents</b>: build a helper subagent, watch Claude and Codex talk, and design a quest of your own.", tip: "Some steps happen in the Claude app's <b>Code</b> tab. Each quest tells you exactly what to paste." },
+  };
+  function tierIntro(tier) {
+    const t = TIER_INTROS[tier]; if (!t) return;
+    progress.intros = Object.assign({}, progress.intros, { [tier]: true }); save();
+    openModal(`<p class="eyebrow">NEW TIER UNLOCKED</p><h2 id="modal-title">${t.title}</h2><p>${t.body}</p><p class="why">${t.tip}</p><button type="button" class="primary modal-go" data-close>Let's go</button>`);
+  }
+
+  // First visit: How to play. After an update: How to play, with what's new on top.
+  function showStartPopup() {
+    const isNew = !progress.wins && !Object.keys(progress.done).length && !progress.howtoSeen;
+    if (isNew) { openModal(howToHTML(false), () => { progress.howtoSeen = true; progress.seenVersion = VERSION; save(); }); return; }
+    if (progress.seenVersion !== VERSION) openModal(howToHTML(true), () => { progress.howtoSeen = true; progress.seenVersion = VERSION; save(); });
   }
 
   // ---- 🔍 The console helper, for Quest 10 ----
@@ -588,7 +736,7 @@ const Lessons = (() => {
     const b = $("start-over"); let armed = false;
     b.addEventListener("click", () => {
       if (!armed) { armed = true; b.textContent = "Sure? Click again to wipe progress"; setTimeout(() => { armed = false; b.textContent = "Start over"; }, 4000); return; }
-      progress = { wins: 0, losses: 0, done: {}, seen: [], checks: {} }; save(); location.reload();   // savedPrint resets too
+      progress = { wins: 0, losses: 0, done: {}, seen: [], checks: {}, difficulty: progress.difficulty }; save(); location.reload();   // savedPrint resets too
     });
   }
 
@@ -598,6 +746,7 @@ const Lessons = (() => {
     result.problems = result.problems.concat(extras.problems);
     // Save-point fingerprints now cover all your files. Start counting from today's files.
     if (progress.printVersion !== 2 && !result.problems.length) { progress.savedPrint = fingerprint(); progress.printVersion = 2; save(); }
+    if (!progress.lastLoaded && !result.problems.length) progress.lastLoaded = fingerprint();   // first visit: nothing has "changed" yet
     renderChecker();
     if (!isLocal) $("preview-banner").hidden = false;
     document.querySelectorAll(".pet-name").forEach(el => el.textContent = S.name);
@@ -612,8 +761,12 @@ const Lessons = (() => {
     document.querySelectorAll("[data-peek]").forEach(b => b.addEventListener("click", () => peekTopic(b.dataset.peek)));
     $("peek-close").addEventListener("click", () => $("peek").hidden = true);
     initStartOver();
-    showWhatsNew();
+    showStartPopup();
+    $("howto-open").addEventListener("click", () => { $("more").hidden = true; openModal(howToHTML(false)); });
     initConsoleHelper();
+    initMenu();
+    initDifficulty();
+    initRename();
     Sound.bindToggle($("sound-toggle"));
     renderNotebook();
     $("notebook-open").addEventListener("click", openNotebook);
@@ -629,7 +782,7 @@ const Lessons = (() => {
     Battle.init(S); Battle.start();
   }
 
-  return { init, level, recordWin, recordLoss, peekMove, cheerLine };
+  return { init, level, difficulty, recordWin, recordLoss, peekMove, cheerLine };
 })();
 
 Lessons.init();

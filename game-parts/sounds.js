@@ -55,7 +55,12 @@ const Sound = (() => {
   function play(name) { if (on && SOUNDS[name]) { try { SOUNDS[name](); } catch (e) {} } }
 
   function bindToggle(btn) {
-    const show = () => { btn.textContent = on ? "🔊 Sound on" : "🔇 Sound off"; btn.setAttribute("aria-pressed", String(on)); };
+    const show = () => {
+      btn.textContent = on ? "🔊" : "🔇";
+      btn.title = on ? "Sound on (click to mute)" : "Sound off (click to turn on)";
+      btn.setAttribute("aria-label", on ? "Sound on" : "Sound off");
+      btn.setAttribute("aria-pressed", String(on));
+    };
     show();
     btn.addEventListener("click", () => {
       on = !on; try { localStorage.setItem(KEY, on ? "on" : "off"); } catch (e) {}

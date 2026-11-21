@@ -18,25 +18,19 @@
 </head>
 <body>
   <main class="shell">
+    <!-- TOP BAR: just the essentials. Everything else lives in the ☰ menu. -->
     <header class="top">
-      <div class="brand"><span class="brand-mark" aria-hidden="true">🔥</span> SNOOT PETS</div>
-      <nav class="top-links">
+      <div class="brand"><span aria-hidden="true">🔥</span> Snoot Pets</div>
+      <nav class="top-actions">
         <span class="level" id="level">Level 0</span>
-        <button type="button" class="notebook-btn" id="notebook-open">📓 Notebook <span class="nb-count" id="nb-count"></span></button>
-        <a href="guide.html">Guide</a>
+        <button type="button" class="top-btn" id="notebook-open" aria-label="Notebook">📓<span class="top-label"> Notebook</span><span class="nb-count" id="nb-count"></span></button>
+        <button type="button" class="top-btn icon" id="sound-toggle" aria-pressed="true" aria-label="Sound on">🔊</button>
+        <button type="button" class="top-btn icon" id="more-open" aria-label="Menu">☰</button>
       </nav>
     </header>
 
-    <p class="preview-banner" id="preview-banner" hidden>You're viewing the online version. To change your pet, edit the files in your own copy of the folder, then open its <b>index.html</b>.</p>
-
-    <div class="whats-new" id="whats-new" role="status" hidden></div>
-
-    <div id="checker" class="checker" role="status" aria-live="polite"></div>
-
-    <section class="hero">
-      <h1><span class="pet-name">Embersnoot</span> <span class="vs">vs</span> Dewsnoot</h1>
-      <p class="yours">🔥 <b><span class="pet-name">Embersnoot</span> is yours.</b> Change it in <code>my-embersnoot.js</code>, save (⌘S), then reload this page (⌘R).</p>
-    </section>
+    <!-- Only shows when something needs your attention (or right after a change worked). -->
+    <div id="checker" class="checker" role="status" aria-live="polite" hidden></div>
 
     <section class="arena-card" aria-label="Battle arena">
       <div class="arena" id="arena">
@@ -45,11 +39,13 @@
           <span class="team-badge badge-them">OPPONENT · TEAM GARDEN 🌿</span>
           <div class="nameplate">
             <span>Dewsnoot <small id="dew-level">gentle</small></span>
-            <span class="tag" id="dew-shield" hidden>fern shield</span>
+            <span class="tags"><span class="tag" id="dew-shield" hidden>fern shield</span><span class="tag" id="dew-scent" hidden>has your scent</span></span>
           </div>
           <div class="bar"><div class="fill fill-dew" id="dew-bar"></div></div>
           <span class="puff" id="dew-puff">30 / 30</span>
           <div class="dew-stage">
+            <!-- Dewsnoot's next move. It never lies: what it shows is what he does. -->
+            <div class="intent" id="dew-intent" role="status" aria-live="polite" hidden></div>
             <div class="dew-mover" id="dew-mover">
               <div class="shield-bubble" id="shield-bubble" hidden></div>
               <div class="dew-scale"><div class="dew-sprite" id="dew-sprite" role="img" aria-label="Dewsnoot, the opponent: a slate-blue garden creature with a fern fan"></div></div>
@@ -60,12 +56,20 @@
         <div class="side side-ember">
           <span class="team-badge badge-you" id="badge-you">YOU · TEAM FLAME 🔥</span>
           <div class="nameplate">
-            <span class="pet-name">Embersnoot</span>
+            <span class="name-wrap"><span class="pet-name">Embersnoot</span><button type="button" class="rename-btn" id="rename-open" title="Try a new name" aria-label="Try a new name">✏️</button></span>
             <span class="tag" id="ember-charged" hidden>kindled ×2</span>
           </div>
           <div class="bar"><div class="fill fill-ember" id="ember-bar"></div></div>
           <span class="puff" id="ember-puff">40 / 40</span>
           <canvas id="ember-canvas" class="ember-canvas" role="img" aria-label="Your pet: a painted fire creature with a crown of flames, a soot mask and a flame-tipped tail"></canvas>
+          <!-- Try a new name: a preview, plus the line to paste into my-embersnoot.js -->
+          <div class="rename-pop" id="rename-pop" hidden>
+            <label for="rename-input"><b>Try a new name</b></label>
+            <input id="rename-input" maxlength="18" autocomplete="off">
+            <p class="small">This is a preview. To keep it, put this line in <code>my-embersnoot.js</code> (replace the <code>name:</code> line), then save ⌘S and reload ⌘R:</p>
+            <pre class="rename-line"><code id="rename-line"></code></pre>
+            <div class="rename-actions"><button type="button" class="primary" id="rename-copy">Copy line</button><button type="button" class="chip" id="rename-close">Done</button></div>
+          </div>
         </div>
         <div class="action-banner" id="action-banner" aria-hidden="true"></div>
         <div class="fx" id="fx" aria-hidden="true"></div>
@@ -73,16 +77,8 @@
 
       <p class="battle-log" id="battle-log" role="status" aria-live="polite">Getting ready…</p>
       <div class="moves" id="moves"></div>
+      <div class="arena-foot"><button type="button" class="primary" id="rematch" hidden>Spar again</button></div>
       <div class="save-reminder" id="save-reminder" role="status" hidden></div>
-      <div class="arena-foot">
-        <button type="button" class="primary" id="rematch" hidden>Spar again</button>
-        <button type="button" class="chip" id="sound-toggle" aria-pressed="true">🔊 Sound on</button>
-        <span class="peeks">Show me the code:
-          <button type="button" class="chip" data-peek="bar">puff bar</button>
-          <button type="button" class="chip" data-peek="dew">Dewsnoot's moves</button>
-          <button type="button" class="chip" data-peek="checker">green/red bar</button>
-        </span>
-      </div>
     </section>
 
     <section class="peek" id="peek" hidden aria-labelledby="peek-title">
@@ -93,22 +89,59 @@
       <p class="peek-try" id="peek-try"></p>
     </section>
 
-    <section class="quests" aria-labelledby="quests-title">
-      <div class="quests-side">
-        <p class="eyebrow">LEARN BY DOING</p>
-        <h2 id="quests-title">Quests</h2>
-        <ol class="quest-list" id="quest-list"></ol>
-        <div class="my-quests" id="my-quests" hidden></div>
-        <p class="small">Each quest you finish levels up <span class="pet-name">Embersnoot</span> and unlocks a card in your 📓 Notebook. Dewsnoot gets tougher up to Level 8.</p>
+    <!-- QUESTS: one at a time, right under the game. -->
+    <section class="questbar" aria-label="Quests">
+      <div class="qb-head">
+        <div class="qb-dots" id="quest-dots" aria-label="Quest progress"></div>
+        <button type="button" class="chip" id="all-quests-toggle" aria-expanded="false">All quests</button>
       </div>
       <div class="quest-card" id="quest-card"></div>
+      <div class="all-quests" id="all-quests" hidden>
+        <ol class="quest-list" id="quest-list"></ol>
+        <div class="my-quests" id="my-quests" hidden></div>
+        <p class="small">Each quest levels up <span class="pet-name">Embersnoot</span>: a little more puff and, every 4 levels, more power. It also unlocks a 📓 Notebook card. Dewsnoot gets tougher up to Level 8.</p>
+      </div>
     </section>
-
-    <footer class="foot">
-      <p>🔥 Your pet lives in <code>my-embersnoot.js</code>. Change it any time.</p>
-      <button type="button" class="chip" id="start-over">Start over</button>
-    </footer>
   </main>
+
+  <!-- ☰ MENU: the extras, out of the way of the game -->
+  <aside class="drawer" id="more" hidden aria-labelledby="more-title">
+    <div class="nb-head"><h2 id="more-title">☰ Menu</h2><button type="button" class="chip" id="more-close">Close</button></div>
+    <div class="menu-block">
+      <p class="eyebrow">YOUR FILES</p>
+      <p id="menu-status">✓ Your files look good.</p>
+      <p class="small">🔥 Your pet lives in <code>my-embersnoot.js</code>. Change it any time: save ⌘S, then reload ⌘R.</p>
+      <p class="small preview-note" id="preview-banner" hidden>You're viewing the online version, which can't see your files. To change your pet, edit your own copy of the folder and open its <b>index.html</b>.</p>
+    </div>
+    <div class="menu-block">
+      <p class="eyebrow">SPARRING</p>
+      <p class="small">How tough is Dewsnoot?</p>
+      <div class="menu-chips diff-chips" id="diff-chips" role="radiogroup" aria-label="Difficulty">
+        <button type="button" class="chip" data-diff="gentle" role="radio">Gentle</button>
+        <button type="button" class="chip" data-diff="normal" role="radio">Normal</button>
+        <button type="button" class="chip" data-diff="fierce" role="radio">Fierce</button>
+      </div>
+      <p class="small" id="diff-note"></p>
+      <p class="record" id="record"></p>
+      <p class="small">Keys: press <kbd>1</kbd>–<kbd>4</kbd> to pick a move.</p>
+    </div>
+    <div class="menu-block">
+      <p class="eyebrow">BEHIND THE SCENES</p>
+      <p class="small">See the code that makes each part work:</p>
+      <div class="menu-chips">
+        <button type="button" class="chip" data-peek="bar">The puff bar</button>
+        <button type="button" class="chip" data-peek="dew">Dewsnoot's moves</button>
+        <button type="button" class="chip" data-peek="checker">The green/red bar</button>
+      </div>
+      <p class="small">Each move button also has its own <b>&lt;/&gt;</b>.</p>
+    </div>
+    <div class="menu-block">
+      <p class="eyebrow">MORE</p>
+      <p><button type="button" class="chip" id="howto-open">❓ How to play</button></p>
+      <p><a href="guide.html">📖 Read the full guide</a></p>
+      <p><button type="button" class="chip" id="start-over">Start over</button> <span class="small">wipes quests, level and wins</span></p>
+    </div>
+  </aside>
 
   <!-- The Notebook: slides in from the right -->
   <aside class="notebook" id="notebook" hidden aria-labelledby="nb-title">
@@ -125,6 +158,14 @@
       <button type="button" class="primary" id="nb-next">Next →</button>
     </div>
   </aside>
+
+  <!-- POP-UP: "How to play" and short intros. Closes with ✕, Esc, or a click outside. -->
+  <div class="modal-backdrop" id="modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <button type="button" class="modal-x" id="modal-x" aria-label="Close">✕</button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
