@@ -108,6 +108,7 @@ const Editor = (() => {
     init();
     $("editor").hidden = false;
     load(path, find);
+    window.dispatchEvent(new CustomEvent("snoot-editor-open"));      // Quest 2 online: "Meet the code editor"
   }
   function close() { $("editor").hidden = true; }
 

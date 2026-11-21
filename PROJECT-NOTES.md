@@ -29,7 +29,8 @@ The live game updates a minute or two later.
 | `dca3db2` | Round 5: Explorer and Builder quests, lore, your own quests, practice files |
 | `4595814` | Round 5 follow-ups: result banner, Kindle and Quest 9 wording, Notebook intro, this notes file |
 | `c4ff1a6` | Round 6: cleaner screen layout. Slim top bar, ☰ menu, one quest at a time under the game, ✏️ rename preview, green bar only after a change, ❓ How to play pop-up (first visit, after updates, ☰ menu, Tier 2/3 intros). Round 7: fight rework (see below) |
-| *next* | Online code editor: ✏️ Edit code in the online game, Save & run in the browser, Reset to original, quest buttons that open the right file, "Skip for now" for computer-only quests |
+| `07391e3` | Online code editor: ✏️ Edit code in the online game, Save & run in the browser, Reset to original, quest buttons that open the right file, "Skip for now" for computer-only quests |
+| *next* | Codex play-test fixes: 🎯 current-quest cue, online Quest 2 "Meet the code editor", shorter first-time guide |
 
 ## Reviews and what happened to them
 
@@ -69,6 +70,10 @@ The live game updates a minute or two later.
   - Reset to original brings a file back.
   - Each quest card online says where to do it and has a button that opens the right file. Quests that need the Claude app on a computer (Git, diffs, Console, subagent, terminal) have "Skip for now".
   - On your Mac nothing changes: you still use VS Code, and the ✏️ is still the name preview.
+- **After Codex's play-test of the online version:**
+  - A 🎯 current-quest cue now sits in the arena under the moves. Clicking it jumps to the quest.
+  - Online, Quest 2 is "Meet the code editor". It completes when you open the editor, not from an "I did it" button. Your Mac copy still has the VS Code quest.
+  - The first-time guide shows three boxes (your pet, spar, quests), with "Show more" for the rest. The guide in the ☰ menu shows all six.
 - **Skipped on purpose:** achievements and badges for everything (rewards that aren't tied to learning tend to replace the fun), and a fast-forward button (a spar takes about half a minute).
 
 ## Open: watch while playing

@@ -288,7 +288,7 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .
 .rename-line { margin: 6px 0; background: #221c1d; color: #ffd8a8; border-radius: 10px; padding: 8px 10px; font: .82rem ui-monospace, Menlo, monospace; white-space: pre-wrap; }
 .rename-line code { background: none; padding: 0; color: inherit; }
 .rename-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-.arena-foot:empty, .arena-foot:has(> [hidden]:only-child) { display: none; }
+.arena-foot:empty, .arena-foot:not(:has(> :not([hidden]))) { display: none; }
 
 @media (max-width: 640px) {
   .top-label { display: none; }
@@ -391,3 +391,14 @@ kbd { font: 700 .75rem ui-monospace, monospace; border: 1px solid var(--line); b
 .ed-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 #ed-status { margin: 0; }
 @media (max-width: 700px) { .editor { padding: 14px 12px 24px; } .ed-gutter, .ed-text { font-size: 12px; } }
+
+/* ---- 🎯 Current quest cue (in the arena) and the quest card flash ---- */
+.quest-cue { margin-left: auto; border: 1px dashed var(--ember); background: var(--ember-soft); color: var(--ink); border-radius: 99px; padding: 6px 14px; font-size: .86rem; cursor: pointer; text-align: left; }
+.quest-cue:hover { background: #fff; }
+.quest-card.flash { animation: card-flash 1.2s ease-out; }
+@keyframes card-flash { 0% { box-shadow: 0 0 0 0 rgba(255, 138, 36, .6); } 100% { box-shadow: 0 0 0 14px rgba(255, 138, 36, 0); } }
+@media (max-width: 700px) { .quest-cue { margin-left: 0; width: 100%; } }
+
+/* ---- How to play: the optional extra boxes ---- */
+.howto-more { margin-top: 12px; }
+.howto-more summary { cursor: pointer; font-weight: 700; color: var(--ember); margin-bottom: 10px; }

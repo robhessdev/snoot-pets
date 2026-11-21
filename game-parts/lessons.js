@@ -28,7 +28,7 @@ const Lessons = (() => {
   const editHere = what => `Online, you change ${what} right here: click the button, make the change, then press <b>Save &amp; run</b>.`;
   const computerOnly = "This quest happens on a computer with the Claude app. Read it to see what's possible, then skip ahead.";
   const ONLINE = {
-    vscode:    { note: "Online you don't need VS Code: the game has its own code editor. Click ✏️ next to your pet's name any time.", skip: "Use the game's editor →" },
+    vscode:    { note: "No install needed: the game has its own code editor. It also opens from ✏️ next to your pet's name.", file: PET, find: 'name: "' },
     rename:    { note: editHere(`<code>${PET}</code>`), file: PET, find: 'name: "' },
     color:     { note: editHere(`<code>${PET}</code>`), file: PET, find: "flame:" },
     power:     { note: editHere(`<code>${PET}</code>`), file: PET, find: "power: 8" },
@@ -214,6 +214,24 @@ const Lessons = (() => {
       check: () => myQuests().length > 0,
     },
   ];
+
+  // Online, Quest 2 is about the game's own editor instead of installing VS Code.
+  // It completes the first time you open the editor.
+  if (!isLocal) Object.assign(QUESTS.find(q => q.id === "vscode"), {
+    title: "Meet the code editor", manual: false,
+    why: "Code is just text in a file. Programmers change it in an <b>editor</b>. Online, the game has one built in, so there's nothing to install.",
+    steps: [
+      "Click the <b>✏️ Open my-embersnoot.js</b> button above, or ✏️ next to your pet's name.",
+      "Look around: lines starting with <code>//</code> are notes for people. The game skips them.",
+      "Find the line <code>name: \"Embersnoot\",</code>. That's your pet's name. You'll change it in the next quest.",
+    ],
+    check: () => !!(progress.flags && progress.flags.editor),
+  });
+  window.addEventListener("snoot-editor-open", () => {
+    if (progress.flags && progress.flags.editor) return;
+    progress.flags = Object.assign({}, progress.flags, { editor: true }); save();
+    const n = evaluate(); if (n.length) { celebrate(n); renderQuests(); }
+  });
 
   const level = () => QUESTS.filter(q => progress.done[q.id]).length;
   const TIERS = { 1: "Starter", 2: "Explorer", 3: "Builder" };
@@ -447,6 +465,10 @@ const Lessons = (() => {
     $("level").textContent = `Level ${lv}`;
     const current = QUESTS.find(q => !progress.done[q.id]);
     if (viewing && viewing === current) viewing = null;
+    // 🎯 A small cue in the arena, so the learning path is never off-screen.
+    const cue = $("quest-cue");
+    cue.hidden = !current;
+    if (current) cue.innerHTML = `🎯 <b>Quest ${QUESTS.indexOf(current) + 1}:</b> ${current.title} <span aria-hidden="true">↓</span>`;
 
     // progress dots, grouped by tier
     const dots = $("quest-dots"); dots.innerHTML = "";
@@ -713,7 +735,8 @@ const Lessons = (() => {
     $("modal-body").querySelectorAll("[data-close]").forEach(b => b.onclick = close);
   }
 
-  function howToHTML(news) {
+  // short: the first-visit version shows the 3 essentials, with the rest one click away.
+  function howToHTML(news, short) {
     const name = esc(S.name);
     const newBox = news ? `<div class="modal-news"><p><b>🆕 New this time</b></p><ul>${WHATS_NEW.map(w => `<li>${w}</li>`).join("")}</ul></div>` : "";
     return `<p class="eyebrow">HOW TO PLAY</p><h2 id="modal-title">Welcome to Snoot Pets</h2>${newBox}
@@ -721,12 +744,16 @@ const Lessons = (() => {
         <div><p class="ht-icon">🔥</p><p><b>Your pet</b><br>${name} is yours, on the right. Dewsnoot, on the left, is the friendly opponent who guards his garden.</p></div>
         <div><p class="ht-icon">⚔️</p><p><b>Spar</b><br>The bubble over Dewsnoot shows his <b>next move</b>. Answer it: <b>Smoke Puff</b> dodges a 💧 splash, <b>Kindle</b> before a 🌿 shield so your doubled hit burns through, hit hard when he 💪 heals. Keys <b>1</b>–<b>4</b> work too. Whoever runs out of puff sits down.</p></div>
         <div><p class="ht-icon">⭐</p><p><b>Quests and levels</b><br>Quests under the game teach you code, one small step at a time. Each one levels up ${name}: more puff, more power every 4 levels, a Notebook card and lore. Dewsnoot trains too, up to Level 8.</p></div>
+      </div>
+      ${short ? `<details class="howto-more"><summary>Show more: making it yours, the Notebook, the menu</summary>` : ""}
+      <div class="howto-grid">
         ${isLocal
           ? `<div><p class="ht-icon">✏️</p><p><b>Make it yours</b><br>Your pet's settings live in <code>my-embersnoot.js</code>. Change it, save (⌘S), reload (⌘R). A <b>green</b> bar means it worked; a <b>red</b> one says how to fix it.</p></div>`
           : `<div><p class="ht-icon">✏️</p><p><b>Make it yours</b><br>Click <b>✏️</b> next to your pet's name to open its code right here. Change a word or number, press <b>Save &amp; run</b>. A <b>green</b> bar means it worked; a <b>red</b> one says which line to fix.</p></div>`}
         <div><p class="ht-icon">📓</p><p><b>Notebook</b><br>Everything you learn, one card at a time, with a quick question at the end of each chapter.</p></div>
         <div><p class="ht-icon">☰</p><p><b>Menu</b><br>Gentle, Normal or Fierce, your win record, this guide again, code peeks and your file status.</p></div>
       </div>
+      ${short ? `</details>` : ""}
       <button type="button" class="primary modal-go" data-close>Let's play</button>`;
   }
 
@@ -743,8 +770,8 @@ const Lessons = (() => {
   // First visit: How to play. After an update: How to play, with what's new on top.
   function showStartPopup() {
     const isNew = !progress.wins && !Object.keys(progress.done).length && !progress.howtoSeen;
-    if (isNew) { openModal(howToHTML(false), () => { progress.howtoSeen = true; progress.seenVersion = VERSION; save(); }); return; }
-    if (progress.seenVersion !== VERSION) openModal(howToHTML(true), () => { progress.howtoSeen = true; progress.seenVersion = VERSION; save(); });
+    if (isNew) { openModal(howToHTML(false, true), () => { progress.howtoSeen = true; progress.seenVersion = VERSION; save(); }); return; }
+    if (progress.seenVersion !== VERSION) openModal(howToHTML(true, true), () => { progress.howtoSeen = true; progress.seenVersion = VERSION; save(); });
   }
 
   // ---- 🔍 The console helper, for Quest 10 ----
@@ -806,6 +833,11 @@ const Lessons = (() => {
     initConsoleHelper();
     initMenu();
     initDifficulty();
+    $("quest-cue").addEventListener("click", () => {
+      viewing = null; renderQuests();
+      const card = $("quest-card"); card.scrollIntoView({ behavior: "smooth", block: "start" });
+      card.classList.remove("flash"); void card.offsetWidth; card.classList.add("flash");
+    });
     initRename();
     Sound.bindToggle($("sound-toggle"));
     renderNotebook();
