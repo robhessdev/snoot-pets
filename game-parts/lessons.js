@@ -28,7 +28,7 @@ const Lessons = (() => {
   const editHere = what => `Online, you change ${what} right here: click the button, make the change, then press <b>Save &amp; run</b>.`;
   const computerOnly = "This quest happens on a computer with the Claude app. Read it to see what's possible, then skip ahead.";
   const ONLINE = {
-    vscode:    { note: "On a computer, this quest is <b>Install VS Code and open the folder</b>. Online there's nothing to install: the game has its own code editor, so <b>opening it completes this quest</b>. It also opens from ✏️ next to your pet's name.", file: PET, find: 'name: "' },
+    vscode:    { note: "Online, the game's own editor stands in for VS Code. Opening it completes this quest.", file: PET, find: 'name: "' },
     rename:    { note: editHere(`<code>${PET}</code>`), file: PET, find: 'name: "' },
     color:     { note: editHere(`<code>${PET}</code>`), file: PET, find: "flame:" },
     power:     { note: editHere(`<code>${PET}</code>`), file: PET, find: "power: 8" },
@@ -225,9 +225,8 @@ const Lessons = (() => {
       "Click the <b>✏️ Open my-embersnoot.js</b> button above, or ✏️ next to your pet's name.",
       "Look around: lines starting with <code>//</code> are notes for people. The game skips them.",
       "Find the line <code>name: \"Embersnoot\",</code>. That's your pet's name. You'll change it in the next quest.",
-      "Playing on your Mac later? Your copy there has the full VS Code quest. Progress doesn't carry over between the two.",
     ],
-    doneNote: "Opening the editor was the whole quest online. On a computer, this step is installing VS Code.",
+    doneNote: "(On a computer, this step is installing VS Code.)",
     check: () => !!(progress.flags && progress.flags.editor),
   });
   window.addEventListener("snoot-editor-open", () => {

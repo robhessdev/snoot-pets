@@ -31,7 +31,8 @@ The live game updates a minute or two later.
 | `c4ff1a6` | Round 6: cleaner screen layout. Slim top bar, ☰ menu, one quest at a time under the game, ✏️ rename preview, green bar only after a change, ❓ How to play pop-up (first visit, after updates, ☰ menu, Tier 2/3 intros). Round 7: fight rework (see below) |
 | `07391e3` | Online code editor: ✏️ Edit code in the online game, Save & run in the browser, Reset to original, quest buttons that open the right file, "Skip for now" for computer-only quests |
 | `c734824` | Codex play-test fixes: 🎯 current-quest cue, online Quest 2 "Meet the code editor", shorter first-time guide |
-| *next* | Pacing round: 🎯 "Your next step" panel in the arena, later tiers and Notebook chapters folded until reached, clearer online VS Code quest |
+| `31118b4` | Pacing round: 🎯 "Your next step" panel in the arena, later tiers and Notebook chapters folded until reached, clearer online VS Code quest |
+| *next* | GPT play-test polish: shorter online Quest 2 text, 🔥 tab icon (no more favicon errors), tighter arena labels on phones under 420px wide |
 
 ## Reviews and what happened to them
 
