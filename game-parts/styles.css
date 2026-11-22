@@ -392,12 +392,23 @@ kbd { font: 700 .75rem ui-monospace, monospace; border: 1px solid var(--line); b
 #ed-status { margin: 0; }
 @media (max-width: 700px) { .editor { padding: 14px 12px 24px; } .ed-gutter, .ed-text { font-size: 12px; } }
 
-/* ---- 🎯 Current quest cue (in the arena) and the quest card flash ---- */
-.quest-cue { margin-left: auto; border: 1px dashed var(--ember); background: var(--ember-soft); color: var(--ink); border-radius: 99px; padding: 6px 14px; font-size: .86rem; cursor: pointer; text-align: left; }
-.quest-cue:hover { background: #fff; }
+/* ---- 🎯 Your next step (in the arena) and the quest card flash ---- */
+.next-step { display: flex; align-items: center; gap: 12px; margin-top: 12px; padding: 12px 14px; border: 1.5px solid var(--ember); background: var(--ember-soft); border-radius: 16px; }
+.ns-text { flex: 1; min-width: 0; }
+.ns-text p { margin: 0; }
+.ns-eyebrow { font-size: .72rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ember); }
+.ns-title { font: 500 1.12rem Georgia, serif; margin: 2px 0 !important; }
+.ns-next { font-size: .92rem; }
+.ns-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
 .quest-card.flash { animation: card-flash 1.2s ease-out; }
 @keyframes card-flash { 0% { box-shadow: 0 0 0 0 rgba(255, 138, 36, .6); } 100% { box-shadow: 0 0 0 14px rgba(255, 138, 36, 0); } }
-@media (max-width: 700px) { .quest-cue { margin-left: 0; width: 100%; } }
+@media (max-width: 700px) { .next-step { flex-direction: column; align-items: stretch; } .ns-actions { justify-content: flex-start; } }
+
+/* ---- Later tiers and Notebook chapters, folded up until you reach them ---- */
+.qd-locked { font-size: .72rem; color: var(--muted); border: 1.5px dashed #cdbfb2; border-radius: 99px; padding: 3px 9px; white-space: nowrap; }
+.quest.locked { color: var(--muted); }
+.quest.locked .q-mark { background: transparent; border: 0; }
+.nb-more { margin: 4px 2px 0; grid-column: 1 / -1; color: var(--muted); }
 
 /* ---- How to play: the optional extra boxes ---- */
 .howto-more { margin-top: 12px; }

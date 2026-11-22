@@ -28,12 +28,12 @@ const Lessons = (() => {
   const editHere = what => `Online, you change ${what} right here: click the button, make the change, then press <b>Save &amp; run</b>.`;
   const computerOnly = "This quest happens on a computer with the Claude app. Read it to see what's possible, then skip ahead.";
   const ONLINE = {
-    vscode:    { note: "No install needed: the game has its own code editor. It also opens from ✏️ next to your pet's name.", file: PET, find: 'name: "' },
+    vscode:    { note: "On a computer, this quest is <b>Install VS Code and open the folder</b>. Online there's nothing to install: the game has its own code editor, so <b>opening it completes this quest</b>. It also opens from ✏️ next to your pet's name.", file: PET, find: 'name: "' },
     rename:    { note: editHere(`<code>${PET}</code>`), file: PET, find: 'name: "' },
     color:     { note: editHere(`<code>${PET}</code>`), file: PET, find: "flame:" },
     power:     { note: editHere(`<code>${PET}</code>`), file: PET, find: "power: 8" },
     newmove:   { note: editHere(`<code>${PET}</code>`), file: PET, find: '{ name: "Spark Flick"' },
-    claude:    { note: "The Claude step needs the Claude app on a computer. Online, finish it yourself: change <code>victoryLine</code> to something your pet would brag.", file: PET, find: "victoryLine:" },
+    claude:    { next: "Change victoryLine to something your pet would brag.", note: "The Claude step needs the Claude app on a computer. Online, finish it yourself: change <code>victoryLine</code> to something your pet would brag.", file: PET, find: "victoryLine:" },
     git:       { note: computerOnly, skip: "Skip for now →" },
     changes:   { note: computerOnly, skip: "Skip for now →" },
     peek:      { note: "The Console is on computers (Chrome or Safari). On a phone, skip ahead.", skip: "Skip for now →" },
@@ -49,7 +49,7 @@ const Lessons = (() => {
   // looks at your settings to see if you've done it.
   const QUESTS = [
     {
-      id: "win", title: "Win your first spar",
+      id: "win", title: "Win your first spar", next: "Read Dewsnoot's bubble, then pick the move that answers it.",
       why: "Play first, so you know what you're about to change.",
       steps: [
         "Look at the bubble over Dewsnoot: it shows his <b>next move</b>. Then pick one of yours under the arena.",
@@ -59,7 +59,7 @@ const Lessons = (() => {
       check: () => progress.wins >= 1,
     },
     {
-      id: "vscode", title: "Install VS Code and open the folder", manual: true,
+      id: "vscode", title: "Install VS Code and open the folder", next: "Download VS Code, then open the Snoot-Pets folder in it.", manual: true,
       why: "VS Code is a free editor made for code. It colours the code so mistakes stand out, and it never sneaks in curly quotes like TextEdit does.",
       steps: [
         'Go to <b>code.visualstudio.com</b> and click <b>Download for Mac</b>.',
@@ -71,7 +71,7 @@ const Lessons = (() => {
       check: () => !!progress.done.vscode,
     },
     {
-      id: "rename", title: "Rename your pet",
+      id: "rename", title: "Rename your pet", next: "Change the name between the quotes in my-embersnoot.js.",
       why: "Words inside quotes are called a <b>string</b>. The game shows them, but doesn't try to run them as code.",
       steps: [
         'In <b>my-embersnoot.js</b>, find the line <code>name: "Embersnoot",</code>',
@@ -82,7 +82,7 @@ const Lessons = (() => {
       check: () => fileOK() && S.name !== D.name,
     },
     {
-      id: "color", title: "Pick a new fire colour",
+      id: "color", title: "Pick a new fire colour", next: "Swap the flame: hex code for a colour you like.",
       why: 'Colours in code are <b>hex codes</b>: a # and 6 letters or numbers. <code>"#ff0000"</code> is red, <code>"#00aaff"</code> is sky blue. Your colour paints the sparks, glow and kindle shine around your pet.',
       steps: [
         'Find <code>flame: "#ff8a24",</code> inside the <b>colors</b> block.',
@@ -92,7 +92,7 @@ const Lessons = (() => {
       check: () => fileOK() && (S.colors.flame !== D.colors.flame || S.colors.core !== D.colors.core),
     },
     {
-      id: "power", title: "Make a move stronger",
+      id: "power", title: "Make a move stronger", next: "Raise a hit move's power: number (30 at most).",
       why: "Numbers without quotes are values the game can do maths with. <b>power</b> is subtracted from Dewsnoot's puff.",
       steps: [
         "Find the <b>moves</b> list. Pick a hit move, like Spark Flick.",
@@ -102,7 +102,7 @@ const Lessons = (() => {
       check: () => fileOK() && S.moves.some((m, i) => D.moves[i] && m.kind === "hit" && m.power > D.moves[i].power),
     },
     {
-      id: "newmove", title: "Invent a new move",
+      id: "newmove", title: "Invent a new move", next: "Copy the Spark Flick line and give the copy a new name.",
       why: "The moves are a <b>list</b>: the [ ] brackets hold several { } blocks, one per move. Adding a block adds a move.",
       steps: [
         "Select the whole Spark Flick line, from <code>{</code> to <code>},</code> and copy it (⌘C).",
@@ -112,7 +112,7 @@ const Lessons = (() => {
       check: () => fileOK() && S.moves.length > D.moves.length,
     },
     {
-      id: "claude", title: "Ask Claude to make a change",
+      id: "claude", title: "Ask Claude to make a change", next: "Ask Claude in the Code tab to write a new victoryLine.",
       why: "This is how you'll build bigger things: describe what you want in plain words, then read what Claude changed so you learn from it.",
       steps: [
         "Open the <b>Claude</b> app and switch to the <b>Code</b> tab at the top.",
@@ -123,7 +123,7 @@ const Lessons = (() => {
       check: () => fileOK() && S.victoryLine !== D.victoryLine,
     },
     {
-      id: "git", title: "Make your first save point (Git)", manual: true,
+      id: "git", title: "Make your first save point (Git)", next: "Ask Claude to make your first save point.", manual: true,
       why: "Git takes a snapshot of your whole folder, called a <b>commit</b>. If you ever break something, you can jump back to any snapshot. Real developers use it every day, and it's how GitHub works.",
       steps: [
         "Open the <b>Claude</b> app, switch to the <b>Code</b> tab, and choose the <b>Snoot-Pets</b> folder.",
@@ -136,7 +136,7 @@ const Lessons = (() => {
 
     // ================= TIER 2: EXPLORER — look inside things =================
     {
-      id: "changes", tier: 2, title: "Read the changes", manual: true,
+      id: "changes", tier: 2, title: "Read the changes", next: "Find your change in red and green, in VS Code and on GitHub.", manual: true,
       why: "A <b>diff</b> shows exactly what changed: red lines removed, green lines added. Reading diffs is how you check what Claude, or anyone, really did.",
       steps: [
         'Open your project on GitHub and click <b>Commits</b> to see your save points (for this project: <a href="https://github.com/robhessdev/snoot-pets/commits/main" target="_blank" rel="noopener">github.com/robhessdev/snoot-pets/commits/main</a>). Click the top one. Red lines were removed, green lines were added.',
@@ -146,7 +146,7 @@ const Lessons = (() => {
       check: () => !!progress.done.changes,
     },
     {
-      id: "peek", tier: 2, title: "Peek under the hood",
+      id: "peek", tier: 2, title: "Peek under the hood", next: "Open the browser's Console and type snoot.state()",
       why: "Every website is code running on your own computer, and the browser's <b>Console</b> lets you look inside it, and even change things, while it runs.",
       steps: [
         "Open the developer tools. <b>Chrome:</b> press <b>⌥⌘J</b> (Option + Command + J). <b>Safari:</b> first turn on Safari → Settings → Advanced → <i>Show features for web developers</i>, then press <b>⌥⌘C</b>.",
@@ -157,7 +157,7 @@ const Lessons = (() => {
       check: () => !!(progress.flags && progress.flags.peek),
     },
     {
-      id: "bughunt", tier: 2, title: "Bug hunt",
+      id: "bughunt", tier: 2, title: "Bug hunt", next: "Fix the two bugs in practice/bug-hunt.js.",
       why: "<b>Debugging</b> means finding why code does something different from what it should. Here the notes say what each bit of code should do. Find where the code disagrees.",
       steps: [
         "In VS Code, open the <b>practice</b> folder, then <b>bug-hunt.js</b>.",
@@ -170,7 +170,7 @@ const Lessons = (() => {
       check: () => runTests(BUG_TESTS).every(t => t.ok),
     },
     {
-      id: "functions", tier: 2, title: "Write your first function",
+      id: "functions", tier: 2, title: "Write your first function", next: "Make powerUp give back the power plus 5.",
       why: "A <b>function</b> is a little machine: give it something, it gives something back. Almost all code is made of them, and you've been using the game's all along.",
       steps: [
         "In VS Code, open <b>practice → my-functions.js</b>.",
@@ -183,7 +183,7 @@ const Lessons = (() => {
 
     // ================= TIER 3: BUILDER — work with AI agents =================
     {
-      id: "subagent", tier: 3, title: "Make a subagent", manual: true,
+      id: "subagent", tier: 3, title: "Make a subagent", next: "Write a short job file for a helper AI.", manual: true,
       why: "A <b>subagent</b> is a helper AI with its own job description. Claude Code hands it a task and gets a report back. You'll write one from scratch: it's just a short text file.",
       steps: [
         "In VS Code's file list, make a new folder named <code>.claude</code> (with the dot), and inside it a folder named <code>agents</code>.",
@@ -194,7 +194,7 @@ const Lessons = (() => {
       check: () => !!progress.done.subagent,
     },
     {
-      id: "terminal", tier: 3, title: "Claude and Codex talk", manual: true,
+      id: "terminal", tier: 3, title: "Claude and Codex talk", next: "Ask Claude to send Codex one question.", manual: true,
       why: "The <b>terminal</b> lets one program run another by typing a command. That's how one AI can send another a message and read its answer.",
       steps: [
         "Open the <b>Code</b> tab (Snoot-Pets folder).",
@@ -204,7 +204,7 @@ const Lessons = (() => {
       check: () => !!progress.done.terminal,
     },
     {
-      id: "myquest", tier: 3, title: "Design your own quest",
+      id: "myquest", tier: 3, title: "Design your own quest", next: "Switch on the example quest in my-quests.js.",
       why: "Each quest in this game is just data: a title, a hint and a tiny check. Designing one shows you understand how the whole thing fits together.",
       steps: [
         "In VS Code, open <b>my-quests.js</b> and read the notes at the top.",
@@ -218,13 +218,16 @@ const Lessons = (() => {
   // Online, Quest 2 is about the game's own editor instead of installing VS Code.
   // It completes the first time you open the editor.
   if (!isLocal) Object.assign(QUESTS.find(q => q.id === "vscode"), {
-    title: "Meet the code editor", manual: false,
+    title: "Open the code editor (instead of VS Code)", manual: false,
+    next: "Open the built-in editor. That's all this quest needs.",
     why: "Code is just text in a file. Programmers change it in an <b>editor</b>. Online, the game has one built in, so there's nothing to install.",
     steps: [
       "Click the <b>✏️ Open my-embersnoot.js</b> button above, or ✏️ next to your pet's name.",
       "Look around: lines starting with <code>//</code> are notes for people. The game skips them.",
       "Find the line <code>name: \"Embersnoot\",</code>. That's your pet's name. You'll change it in the next quest.",
+      "Playing on your Mac later? Your copy there has the full VS Code quest. Progress doesn't carry over between the two.",
     ],
+    doneNote: "Opening the editor was the whole quest online. On a computer, this step is installing VS Code.",
     check: () => !!(progress.flags && progress.flags.editor),
   });
   window.addEventListener("snoot-editor-open", () => {
@@ -283,7 +286,7 @@ const Lessons = (() => {
   function celebrate(newly) {
     if (!newly.length) return;
     const lv = level();
-    let msg = `✓ Quest complete: ${newly.map(q => q.title).join(", ")}. ${S.name} is now Level ${lv}.`;
+    let msg = `✓ Quest complete: ${newly.map(q => q.title).join(", ")}. ${newly.map(q => q.doneNote ? q.doneNote + " " : "").join("")}${S.name} is now Level ${lv}.`;
     msg += " 📓 New Notebook card unlocked.";
     if (UNLOCKS[lv]) msg += " " + UNLOCKS[lv];
     if (lv <= 10) msg += ` ${S.name} grows: ${Battle.emberMax(lv)} puff${lv % 4 === 0 ? `, and +${Battle.powerBonus(lv)} power on every hit` : ""}.`;
@@ -303,6 +306,11 @@ const Lessons = (() => {
     id: "lore", title: "Hollowmere lore", icon: "📜",
     cards: extras.lore.map((l, i) => ({ id: "lore-" + i, lore: true, title: l.title, text: l.text, unlockAt: l.unlockAt })),
   }]);
+  // Chapters open one by one as you level up, so the Notebook starts small.
+  // The level is when the chapter's first quest card (or first lore) arrives.
+  const CHAPTER_OPENS = { how: 0, lore: 1, dev: 2, words: 3, pics: 4, ai: 7 };
+  const chapterOpen = ch => level() >= (CHAPTER_OPENS[ch.id] || 0);
+  const openChapters = () => C.filter(chapterOpen);
   const unlocked = card => card.lore ? level() >= card.unlockAt : (!card.quest || !!progress.done[card.quest]);
   const spots = ch => ch.cards.length + (ch.check ? 1 : 0);      // cards, plus the question if there is one
   const questNumber = id => QUESTS.findIndex(q => q.id === id) + 1;
@@ -311,7 +319,7 @@ const Lessons = (() => {
   // Keeps the little number on the Notebook button up to date.
   function renderNotebook() {
     const seen = progress.seen || [];
-    const fresh = C.flatMap(ch => ch.cards).filter(c => unlocked(c) && !seen.includes(c.id)).length;
+    const fresh = openChapters().flatMap(ch => ch.cards).filter(c => unlocked(c) && !seen.includes(c.id)).length;
     $("nb-count").textContent = fresh ? String(fresh) : "";
     if (!$("notebook").hidden) drawNotebook();
   }
@@ -321,6 +329,7 @@ const Lessons = (() => {
     // chapter tabs
     $("nb-tabs").innerHTML = "";
     C.forEach((c, i) => {
+      if (!chapterOpen(c)) return;
       const open = c.cards.filter(unlocked).length, done = progress.checks && progress.checks[c.id];
       const b = document.createElement("button");
       b.type = "button"; b.className = "nb-tab"; b.setAttribute("aria-pressed", String(i === nbCh));
@@ -328,6 +337,12 @@ const Lessons = (() => {
       b.addEventListener("click", () => { nbCh = i; nbIdx = 0; drawNotebook(); });
       $("nb-tabs").append(b);
     });
+    const shut = C.length - openChapters().length;
+    if (shut) {
+      const note = document.createElement("p"); note.className = "nb-more small";
+      note.textContent = `🔒 ${shut} more chapter${shut > 1 ? "s" : ""} open as you finish quests.`;
+      $("nb-tabs").append(note);
+    }
     // the card (or the question)
     const box = $("nb-card");
     if (nbIdx < ch.cards.length) {
@@ -356,13 +371,13 @@ const Lessons = (() => {
     const total = spots(ch), q = !!ch.check;
     $("nb-dots").innerHTML = Array.from({ length: total }, (_, i) =>
       `<span class="nb-dot${i === nbIdx ? " on" : ""}${q && i === total - 1 ? " q" : ""}">${q && i === total - 1 ? "?" : ""}</span>`).join("");
-    $("nb-back").disabled = nbCh === 0 && nbIdx === 0;
-    $("nb-next").textContent = nbIdx === total - 1 ? (nbCh < C.length - 1 ? "Next chapter →" : "Done") : "Next →";
+    $("nb-back").disabled = nextOpen(nbCh, -1) < 0 && nbIdx === 0;
+    $("nb-next").textContent = nbIdx === total - 1 ? (nextOpen(nbCh, 1) >= 0 ? "Next chapter →" : "Done") : "Next →";
     $("nb-count").textContent = "";
     renderBadgeOnly();
   }
   function renderBadgeOnly() {
-    const fresh = C.flatMap(ch => ch.cards).filter(c => unlocked(c) && !(progress.seen || []).includes(c.id)).length;
+    const fresh = openChapters().flatMap(ch => ch.cards).filter(c => unlocked(c) && !(progress.seen || []).includes(c.id)).length;
     $("nb-count").textContent = fresh ? String(fresh) : "";
   }
 
@@ -400,11 +415,12 @@ const Lessons = (() => {
     if (done) { const b = box.querySelectorAll(".nb-option")[k.answer]; b.classList.add("right"); }
   }
 
+  const nextOpen = (from, dir) => { for (let i = from + dir; i >= 0 && i < C.length; i += dir) if (chapterOpen(C[i])) return i; return -1; };
   function nbStep(dir) {
     const total = spots(C[nbCh]);
     nbIdx += dir;
-    if (nbIdx >= total) { if (nbCh < C.length - 1) { nbCh++; nbIdx = 0; } else { closeNotebook(); return; } }
-    if (nbIdx < 0) { if (nbCh > 0) { nbCh--; nbIdx = spots(C[nbCh]) - 1; } else nbIdx = 0; }
+    if (nbIdx >= total) { const n = nextOpen(nbCh, 1); if (n >= 0) { nbCh = n; nbIdx = 0; } else { closeNotebook(); return; } }
+    if (nbIdx < 0) { const n = nextOpen(nbCh, -1); if (n >= 0) { nbCh = n; nbIdx = spots(C[nbCh]) - 1; } else nbIdx = 0; }
     drawNotebook();
   }
 
@@ -417,7 +433,8 @@ const Lessons = (() => {
   function openNotebook() {
     // Start at the first new card, if there is one.
     const seen = progress.seen || [];
-    outer: for (let i = 0; i < C.length; i++) for (let j = 0; j < C[i].cards.length; j++) {
+    if (!chapterOpen(C[nbCh])) { nbCh = 0; nbIdx = 0; }
+    outer: for (let i = 0; i < C.length; i++) for (let j = 0; chapterOpen(C[i]) && j < C[i].cards.length; j++) {
       const c = C[i].cards[j];
       if (unlocked(c) && !seen.includes(c.id)) { nbCh = i; nbIdx = j; break outer; }
     }
@@ -465,15 +482,24 @@ const Lessons = (() => {
     $("level").textContent = `Level ${lv}`;
     const current = QUESTS.find(q => !progress.done[q.id]);
     if (viewing && viewing === current) viewing = null;
-    // 🎯 A small cue in the arena, so the learning path is never off-screen.
-    const cue = $("quest-cue");
-    cue.hidden = !current;
-    if (current) cue.innerHTML = `🎯 <b>Quest ${QUESTS.indexOf(current) + 1}:</b> ${current.title} <span aria-hidden="true">↓</span>`;
+    renderNextStep(current);
 
-    // progress dots, grouped by tier
+    // progress dots, grouped by tier. Later tiers stay folded up as one 🔒 chip until you reach them,
+    // so a beginner sees this tier's few quests, not all 15 at once.
+    const nowTier = current ? tierOf(current) : 99;
+    const lockedTier = t => t > nowTier;
+    const tierCount = t => QUESTS.filter(q => tierOf(q) === t).length;
     const dots = $("quest-dots"); dots.innerHTML = "";
     QUESTS.forEach((q, i) => {
-      if (i > 0 && tierOf(q) !== tierOf(QUESTS[i - 1])) { const gap = document.createElement("span"); gap.className = "qd-gap"; dots.append(gap); }
+      const newTier = i > 0 && tierOf(q) !== tierOf(QUESTS[i - 1]);
+      if (newTier) { const gap = document.createElement("span"); gap.className = "qd-gap"; dots.append(gap); }
+      if (lockedTier(tierOf(q))) {
+        if (!newTier) return;
+        const t = tierOf(q), chip = document.createElement("span");
+        chip.className = "qd-locked"; chip.textContent = `🔒 ${TIERS[t]} · ${tierCount(t)}`;
+        chip.title = `Tier ${t}, ${TIERS[t]}: ${tierCount(t)} quests. They open after the ${TIERS[t - 1]} quests.`;
+        dots.append(chip); return;
+      }
       const d = document.createElement("button"); d.type = "button";
       const done = !!progress.done[q.id];
       d.className = "qd" + (done ? " done" : "") + (q === current ? " current" : "") + ((viewing || current) === q ? " viewing" : "");
@@ -488,9 +514,15 @@ const Lessons = (() => {
     const list = $("quest-list"); list.innerHTML = "";
     QUESTS.forEach((q, i) => {
       if (i === 0 || tierOf(q) !== tierOf(QUESTS[i - 1])) {
-        const h = document.createElement("li"); h.className = "tier-head";
-        h.textContent = `Tier ${tierOf(q)}: ${TIERS[tierOf(q)]}`; list.append(h);
+        const t = tierOf(q), h = document.createElement("li"); h.className = "tier-head";
+        h.textContent = `Tier ${t}: ${TIERS[t]}`; list.append(h);
+        if (lockedTier(t)) {
+          const li = document.createElement("li"); li.className = "quest locked";
+          li.innerHTML = `<span class="q-mark">🔒</span><span class="q-title">${tierCount(t)} quests. They open after the ${TIERS[t - 1]} quests.</span>`;
+          list.append(li);
+        }
       }
+      if (lockedTier(tierOf(q))) return;
       const li = document.createElement("li"), done = !!progress.done[q.id];
       li.className = "quest" + (done ? " done" : "") + (q === current ? " current" : "");
       const b = document.createElement("button"); b.type = "button";
@@ -500,6 +532,28 @@ const Lessons = (() => {
     });
     renderMyQuests();
     renderQuestCard(viewing || current, current);
+  }
+
+  // 🎯 YOUR NEXT STEP, in the arena: the current quest, one thing to do now, and a button for it.
+  // The full steps stay in the quest card below; this keeps the learning path in view while you play.
+  function renderNextStep(current) {
+    const box = $("next-step");
+    box.hidden = !current;
+    if (!current) return;
+    const n = QUESTS.indexOf(current) + 1;
+    const on = !isLocal ? ONLINE[current.id] : null;
+    const next = on && on.skip ? "This one needs the Claude app on a computer. Read what it does, then skip ahead."
+      : (on && on.next) || current.next || "";
+    const fileBtn = on && on.file ? `<button type="button" class="primary" id="ns-edit">✏️ Open ${on.file.split("/").pop()}</button>` : "";
+    box.innerHTML = `<div class="ns-text"><p class="ns-eyebrow">🎯 Your next step · Quest ${n} of ${QUESTS.length}</p>
+      <p class="ns-title">${current.title}</p><p class="ns-next">${esc(next)}</p></div>
+      <div class="ns-actions">${fileBtn}<button type="button" class="chip" id="ns-steps">${current.id === "win" ? "Tips" : "How"} ↓</button></div>`;
+    if (fileBtn) $("ns-edit").addEventListener("click", () => Editor.open(on.file, on.find));
+    $("ns-steps").addEventListener("click", () => {
+      viewing = null; renderQuests();
+      const card = $("quest-card"); card.scrollIntoView({ behavior: "smooth", block: "start" });
+      card.classList.remove("flash"); void card.offsetWidth; card.classList.add("flash");
+    });
   }
 
   function renderQuestCard(q, current) {
@@ -519,7 +573,7 @@ const Lessons = (() => {
     const on = !isLocal && !done ? ONLINE[q.id] : null;          // playing online: where to do this quest
     const onlineNote = on ? `<p class="preview-note">🌐 ${on.note}${on.file ? ` <button type="button" class="chip" id="q-edit">✏️ Open ${on.file.split("/").pop()}</button>` : ""}</p>` : "";
     let status;
-    if (done) status = `<p class="q-status done-note">✓ Done.${hasCard(q.id) ? ' <button type="button" class="chip" id="q-card-open">📓 Read its Notebook card</button>' : ""}</p>`;
+    if (done) status = `<p class="q-status done-note">✓ Done.${!isLocal && q.doneNote ? " " + q.doneNote : ""}${hasCard(q.id) ? ' <button type="button" class="chip" id="q-card-open">📓 Read its Notebook card</button>' : ""}</p>`;
     else if (on && on.skip) status = `<button type="button" class="primary" id="manual-done">${on.skip}</button>`;
     else if (q.manual) status = `<button type="button" class="primary" id="manual-done">I did it ✓</button>`;
     else status = `<p class="q-status">Waiting for you… ${needsFile && isLocal ? "This checks itself when you reload (⌘R)." : ""}</p>`;
@@ -833,11 +887,6 @@ const Lessons = (() => {
     initConsoleHelper();
     initMenu();
     initDifficulty();
-    $("quest-cue").addEventListener("click", () => {
-      viewing = null; renderQuests();
-      const card = $("quest-card"); card.scrollIntoView({ behavior: "smooth", block: "start" });
-      card.classList.remove("flash"); void card.offsetWidth; card.classList.add("flash");
-    });
     initRename();
     Sound.bindToggle($("sound-toggle"));
     renderNotebook();

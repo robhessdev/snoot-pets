@@ -30,7 +30,8 @@ The live game updates a minute or two later.
 | `4595814` | Round 5 follow-ups: result banner, Kindle and Quest 9 wording, Notebook intro, this notes file |
 | `c4ff1a6` | Round 6: cleaner screen layout. Slim top bar, ☰ menu, one quest at a time under the game, ✏️ rename preview, green bar only after a change, ❓ How to play pop-up (first visit, after updates, ☰ menu, Tier 2/3 intros). Round 7: fight rework (see below) |
 | `07391e3` | Online code editor: ✏️ Edit code in the online game, Save & run in the browser, Reset to original, quest buttons that open the right file, "Skip for now" for computer-only quests |
-| *next* | Codex play-test fixes: 🎯 current-quest cue, online Quest 2 "Meet the code editor", shorter first-time guide |
+| `c734824` | Codex play-test fixes: 🎯 current-quest cue, online Quest 2 "Meet the code editor", shorter first-time guide |
+| *next* | Pacing round: 🎯 "Your next step" panel in the arena, later tiers and Notebook chapters folded until reached, clearer online VS Code quest |
 
 ## Reviews and what happened to them
 
@@ -74,6 +75,11 @@ The live game updates a minute or two later.
   - A 🎯 current-quest cue now sits in the arena under the moves. Clicking it jumps to the quest.
   - Online, Quest 2 is "Meet the code editor". It completes when you open the editor, not from an "I did it" button. Your Mac copy still has the VS Code quest.
   - The first-time guide shows three boxes (your pet, spar, quests), with "Show more" for the rest. The guide in the ☰ menu shows all six.
+- **Pacing round (after an outside review):** the battle was clear, but the learning layer felt deep and far down the page (15 quests, six Notebook chapters).
+  - The arena now has a **🎯 Your next step** panel under the moves: the current quest, one line saying what to do now, and a button (✏️ Open the file online, or "How ↓" to jump to the full steps). Each quest has a `next:` line in `lessons.js`.
+  - Quest dots show only the tier you're in. Later tiers show as one 🔒 chip (for example "🔒 Explorer · 4"), and the All quests list hides their titles until you get there.
+  - The Notebook starts with one chapter and opens the rest by level (`CHAPTER_OPENS` in `lessons.js`): How the game works 0, Lore 1, Working like a developer 2, Code words 3, Pictures & animation 4, Working with AI 7.
+  - Online Quest 2 is now "Open the code editor (instead of VS Code)". Its note says that on a computer this quest is installing VS Code, and that opening the editor is what completes it online. The completion message and the Notebook card say so too.
 - **Skipped on purpose:** achievements and badges for everything (rewards that aren't tied to learning tend to replace the fun), and a fast-forward button (a spar takes about half a minute).
 
 ## Open: watch while playing

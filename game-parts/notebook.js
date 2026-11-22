@@ -170,7 +170,7 @@ const NOTEBOOK_CHAPTERS = [
       {
         id: "editor", quest: "vscode", from: "Quest 2",
         title: "Code editors vs. word processors",
-        what: "Word processors (TextEdit, Pages) “prettify” text and swap \" for curly “ ”. A <b>code editor</b> (VS Code) keeps your text exactly as typed.",
+        what: "Word processors (TextEdit, Pages) “prettify” text and swap \" for curly “ ”. A <b>code editor</b> (VS Code, or the ✏️ editor in the online game) keeps your text exactly as typed.",
         example: "<p>VS Code also colours the code so the parts stand out, and puts red squiggles under mistakes.</p>",
         remember: "Write code in a code editor. It's like using a ruler instead of eyeballing it.",
       },
